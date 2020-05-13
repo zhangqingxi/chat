@@ -19,9 +19,13 @@ Route::group(['namespace' => 'Api'], function () {
 
     Route::post('register', 'AuthController@register');
 
-    Route::middleware('auth:api')->group(function () {
+    Route::group(['middleware' => 'auth:api'], function () {
 
-        Route::get('main', 'IndexController@index');
+        Route::group(['prefix' => 'user'], function (){
+
+            Route::PUT('update', 'UserController@update');
+
+        });
 
     });
 

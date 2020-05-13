@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends BaseController
@@ -22,6 +23,7 @@ class AuthController extends BaseController
             $this->validate($request, [
                 'username' => 'required|min:3|max:10',
                 'password' => 'required|min:6|max:16',
+                're_password' => 'same:password',
             ], [
                 'username.required' => '用户名不能为空',
                 'username.min' => '用户名长度最少3个字符',
@@ -29,6 +31,7 @@ class AuthController extends BaseController
                 'password.required' => '密码不能为空',
                 'password.min' => '密码长度最少6个字符',
                 'password.max' => '密码长度最多16个字符',
+                're_password.same' => '两次输入的密码不一致',
             ]);
 
             $username = $request->input('username');
@@ -42,7 +45,7 @@ class AuthController extends BaseController
 
                 $token = $user->createToken('chatForToken')->accessToken;
 
-                return json(RESPONSE_SUCCESS_CODE, '登陆成功', ['token' => $token]);
+                return json(RESPONSE_SUCCESS_CODE, '登陆成功', ['token' => $token, 'user' => $user]);
 
             } else {
 
@@ -88,7 +91,8 @@ class AuthController extends BaseController
 
             $user = User::create([
                 'username' => $request->input('username'),
-                'password' => bcrypt($request->input('password'))
+                'password' => bcrypt($request->input('password')),
+                'chat_no'  => $request->input('username'),
             ]);
 
             $token = $user->createToken('chatForToken')->accessToken;

@@ -16,3 +16,6 @@ const USER_PASSWORD_VALIDATE_ERROR_MSG          = '用户密码错误';
 
 const USER_ACCESS_TOKEN_VALIDATE_ERROR_CODE     = 20002;
 const USER_ACCESS_TOKEN_VALIDATE_ERROR_MSG      = 'access token验证失败';
+
+const USER_CHAT_NO_NOT_UPDATE_ERROR_CODE         = 20003;
+const USER_CHAT_NO_NOT_UPDATE_ERROR_MSG          = '微聊号不允许更新';

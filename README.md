@@ -8,9 +8,9 @@ Swoole 4.4.16
 LaravelS 3.7.0
 
 ## 拓展包
-- [LaravelS](https://github.com/hhxsv5/laravel-s).
-- [Passport](https://github.com/laravel/passport).
-- [Laravel IDE Helper](https://github.com/barryvdh/laravel-ide-helper).
+- [LaravelS](https://github.com/hhxsv5/laravel-s)
+- [Passport](https://github.com/laravel/passport)
+- [Laravel IDE Helper](https://github.com/barryvdh/laravel-ide-helper)
 
 
 ## LaravelS 讲解

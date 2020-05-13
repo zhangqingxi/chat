@@ -12,3 +12,14 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::group(['namespace' => 'Web'], function () {
+
+    Route::get('login', 'ViewController@login');
+
+    Route::get('register', 'ViewController@register');
+
+    Route::get('/', 'ViewController@index');
+
+    Route::get('user', 'ViewController@user');
+
+});

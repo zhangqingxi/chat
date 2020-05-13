@@ -122,12 +122,12 @@ if (!function_exists('json')) {
 
     /**
      * 数据返回
-     * @param int $status
+     * @param int $code
      * @param string $message
      * @param array $data
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
-    function json(int $status = 1, string $message = '成功', $data = [])
+    function json(int $code = 0, string $message = '成功', $data = [])
     {
 
         $exception_message = '';
@@ -141,9 +141,9 @@ if (!function_exists('json')) {
 
         }
 
-        slogs(compact('status', 'message', 'data', 'exception_message'));
+        slogs(compact('code', 'message', 'data', 'exception_message'));
 
-        return response(compact('status', 'message', 'data'));
+        return response(compact('code', 'message', 'data'));
 
     }
 

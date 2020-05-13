@@ -43,9 +43,19 @@ return [
         ],
         'max_wait_time' => 5,
     ],
-    'swoole_tables'            => [],
+    'swoole_tables'            => [
+        // 场景：WebSocket中UserId与FD绑定
+        'ws' => [// Key为Table名称，使用时会自动添加Table后缀，避免重名。这里定义名为wsTable的Table
+            'size'   => 102400,//Table的最大行数
+            'column' => [// Table的列定义
+//                ['name' => 'value', 'type' => \Swoole\Table::TYPE_INT, 'size' => 8],
+            ],
+        ],
+    ],
     'register_providers'       => [],
     'cleaners'                 => [
+        Hhxsv5\LaravelS\Illuminate\Cleaners\SessionCleaner::class,
+        Hhxsv5\LaravelS\Illuminate\Cleaners\AuthCleaner::class,
         // See LaravelS's built-in cleaners: https://github.com/hhxsv5/laravel-s/blob/master/Settings.md#cleaners
     ],
     'destroy_controllers'      => [
@@ -73,10 +83,14 @@ return [
         'socket_buffer_size' => 128 * 1024 * 1024,
         'package_max_length' => 4 * 1024 * 1024,
         'reload_async'       => true,
-        'max_wait_time'      => 0,
+        'max_wait_time'      => 60,
         'enable_reuse_port'  => true,
         'enable_coroutine'   => false,
         'http_compression'   => false,
+
+        // 表示每60秒遍历一次，一个连接如果600秒内未向服务器发送任何数据，此连接将被强制关闭
+        'heartbeat_idle_time'      => 600,
+        'heartbeat_check_interval' => 60,
 
         // Slow log
         // 'request_slowlog_timeout' => 2,

@@ -20,9 +20,8 @@ class WebSocketService implements WebSocketHandlerInterface
     public function onOpen(Server $server, \Swoole\Http\Request $request)
     {
         // TODO: Implement onOpen() method.
-
-//        $server->push($request->fd, json_encode(['type' => 'init', 'data' => ['message' => "Welcome to LaravelS #{$request->fd}"]]));
         Log::info('WebSocket 连接建立');
+
     }
 
     public function onMessage(Server $server, Frame $frame)
@@ -33,19 +32,20 @@ class WebSocketService implements WebSocketHandlerInterface
 
         if(is_array($data)){
 
-            if($data['type'] === 'init'){
+            if($data['type'] === 'init') {
 
-                $user = User::whereToken($data['data']['user_token'])->first();
+                $user = User::find($data['data']['user_id']);
 
-                $userId = $user ? $user->id : 0; // 0 表示未登录的访客用户
+                $uid = $user ? $user->id : 0; // 0 表示未登录的访客用户
 
-                $this->wsTable->set('uid:' . $userId, ['value' => $frame->fd]);// 绑定uid到fd的映射
+                $this->wsTable->set('uid:' . $uid, ['value' => $frame->fd]);// 绑定uid到fd的映射
 
-                $this->wsTable->set('fd:' . $frame->fd, ['value' => $userId]);// 绑定fd到uid的映射
+                $this->wsTable->set('fd:' . $frame->fd, ['value' => $uid]);// 绑定fd到uid的映射
 
             }
 
         }
+
     }
 
     public function onClose(Server $server, $fd, $reactorId)
