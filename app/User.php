@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Storage;
 
 /**
  * App\User
@@ -32,6 +33,22 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string $username
+ * @property string $chat_no 微聊号
+ * @property string $avatar 头像
+ * @property int $sex 性别 0男 1女
+ * @property string $signature 个性签名
+ * @property string $nickname 昵称
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Client[] $clients
+ * @property-read int|null $clients_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
+ * @property-read int|null $tokens_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereChatNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereNickname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereSex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereSignature($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUsername($value)
  */
 class User extends Authenticatable
 {
@@ -64,4 +81,5 @@ class User extends Authenticatable
     {
         return $this->where('username', $username)->first();
     }
+
 }

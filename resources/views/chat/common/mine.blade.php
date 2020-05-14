@@ -14,7 +14,7 @@
 
                         <span class="txt flex1">
 
-                            <em class="user-nickname"></em><i>微聊号：<span class="user-chat-no"></span></i>
+                            <em class="user-nickname"></em><i>微聊号：<span class="user-chat_no"></span></i>
 
                         </span>
 

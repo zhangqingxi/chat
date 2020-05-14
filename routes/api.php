@@ -23,6 +23,8 @@ Route::group(['namespace' => 'Api'], function () {
 
         Route::group(['prefix' => 'user'], function (){
 
+            Route::get('/', 'UserController@index');
+
             Route::PUT('update', 'UserController@update');
 
         });

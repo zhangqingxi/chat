@@ -33,9 +33,9 @@
 
                                 <label class="lbl flex1">头像</label>
 
-                                <img alt="" class="uimg user-avatar" src="" />
+                                <img alt="" class="uimg user-avatar" src="" style="color: " />
 
-                                <input class="chooseImg" type="file" accept="image/*" />
+                                <input class="chooseImg" id="avatar" type="file" accept="image/*" />
 
                             </div>
 
@@ -43,7 +43,7 @@
 
                                 <label class="lbl flex1">微聊号</label>
 
-                                <div class="val user-chat-no"></div>
+                                <div class="val user-chat_no"></div>
 
                             </div>
 
@@ -63,7 +63,7 @@
 
                             </div>
 
-                            <div class="item user-info-item flexbox flex-alignc wc__material-cell" data-field="sign">
+                            <div class="item user-info-item flexbox flex-alignc wc__material-cell" data-field="signature">
 
                                 <label class="lbl flex1">个性签名</label>
 
@@ -84,5 +84,7 @@
     </div>
 
     @include('chat.common.main')
+
+    <script src="{{asset('static/js/ajaxfileupload.js')}}"></script>
 
 @endsection

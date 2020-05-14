@@ -45,7 +45,7 @@ class AuthController extends BaseController
 
                 $token = $user->createToken('chatForToken')->accessToken;
 
-                return json(RESPONSE_SUCCESS_CODE, '登陆成功', ['token' => $token, 'user' => $user]);
+                return json(RESPONSE_SUCCESS_CODE, '登陆成功', ['token' => $token]);
 
             } else {
 

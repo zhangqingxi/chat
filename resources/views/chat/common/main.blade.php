@@ -1,29 +1,20 @@
 <script>
 
-    accessToken = localStorage.getItem('user_access_token');
+    getUserInfo(function (user) {
 
-    if(!accessToken){
+        window.localStorage.setItem('user_id', user['id']);
 
-        wcPop({ content: '登陆已失效，请重新登陆', time:1, end:function () {
+        $('.user-avatar').attr('src', user['avatar']);
 
-                location.href = '/login';
+        $('.user-sex').text(user['sex']);
 
-            }
+        $('.user-signature').text(user['signature']);
 
-        });
+        $('.user-nickname').text(user['nickname'] ? user['nickname'] : user['username']);
 
-    }
+        $('.user-chat_no').text(user['chat_no']);
 
-    $('.user-avatar').attr('src', localStorage.getItem('user_avatar'));
-
-    $('.user-sex').attr('src', localStorage.getItem('user_sex'));
-
-    $('.user-signature').attr('src', localStorage.getItem('user_signature'));
-
-    $('.user-nickname').text(localStorage.getItem('user_nickname') ? localStorage.getItem('user_nickname') : localStorage.getItem('user_username'));
-
-    $('.user-chat-no').text(localStorage.getItem('user_chat_no'));
-
+    });
 
 </script>
 

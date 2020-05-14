@@ -1,6 +1,6 @@
-$(function () {
+const apiUrl = 'https://chat.zhangqingxi.cn/api';
 
-    const apiUrl = 'https://chat.zhangqingxi.cn/api';
+$(function () {
 
     //注册用户
     $('.register').unbind('click').bind('click', function (event) {
@@ -81,20 +81,6 @@ $(function () {
 
                         localStorage.setItem('user_access_token', res.data['token']);
 
-                        localStorage.setItem('user_id', res.data['user']['id']);
-
-                        localStorage.setItem('user_avatar', res.data['user']['avatar'] ? res.data['user']['avatar'] : '');
-
-                        localStorage.setItem('user_sex', res.data['user']['sex'] ? res.data['user']['sex'] : '');
-
-                        localStorage.setItem('user_username', res.data['user']['username'] ? res.data['user']['username'] : '');
-
-                        localStorage.setItem('user_chat_no', res.data['user']['chat_no']);
-
-                        localStorage.setItem('user_signature', res.data['user']['signature'] ? res.data['user']['signature'] : '');
-
-                        localStorage.setItem('user_nickname', res.data['user']['nickname'] ? res.data['user']['signature'] : '');
-
                         location.href = '/';
 
                     }
@@ -124,7 +110,6 @@ $(function () {
             value = $(this).find('.val').text(),
             url = apiUrl + '/user/update';
 
-
         switch (field) {
 
             case 'chat_no':
@@ -139,15 +124,15 @@ $(function () {
 
                 title = '昵称';
 
-                inputHtml.find('input').val(value);
+                inputHtml.find('input').attr('value', value);
 
                 break;
 
-            case 'sign':
+            case 'signature':
 
                 title = '个性签名';
 
-                inputHtml.find('input').val(value);
+                inputHtml.find('input').attr('value', value);
 
                 break;
 
@@ -157,121 +142,263 @@ $(function () {
 
         }
 
-        confirmPopup(title, inputHtml.html(), function (val, index) {
+        if(field === 'sex'){
 
-            value = val;
+            let sexIdx = wcPop({
 
-            //请求ajax
-            ajax(url, 'PUT', {field:field, value:value}, function (res) {
+                id: 'sexChoose',
 
-                wcPop({ content: res.message, time:1});
+                skin: 'androidSheet',
 
-                if(res.code === 0){
+                title: '设置性别',
+
+                shadeClose: true,
+
+                btns: [
+                    {
+
+                        text: '<span>男</span>',
+
+                        style: 'line-height: 50px; ' + (value === '男' ? 'color: red' : ''),
+
+                        onTap(e) {
+
+                            value = '男';
+
+                            updateUser(url, {field:field,value:value}, function (){
+
+                                $('.user-'+field).text(value);
+
+                                wcPop.close(sexIdx);
+
+                            });
+
+                        }
+
+                    },
+                    {
+
+                        text: '<span>女</span>',
+
+                        style: 'line-height: 50px; ' + (value === '女' ? 'color: red' : ''),
+
+                        onTap() {
+
+                            value = '女';
+
+                            updateUser(url, {field:field,value:value}, function (){
+
+                                $('.user-'+field).text(value);
+
+                                wcPop.close(sexIdx);
+
+                            });
+
+                        }
+
+                    },
+
+                ]
+
+            });
+
+        }else{
+
+            confirmPopup(title, inputHtml.html(), function (val, index) {
+
+                value = val;
+
+                updateUser(url, {field:field,value:value}, function (){
+
+                    $('.user-'+field).text(value);
 
                     wcPop.close(index);
 
-                }
-
-            },function () {
-
-                console.log(JSON.stringify(e))
-
-            })
-
-        });
-
-    });
-
-    //封装ajax
-    let ajax = function (url, method, data, successCallback, errorCallback) {
-
-        let accessToken = localStorage.getItem('user_access_token');
-
-        if(accessToken){
-
-            $.ajaxSetup({
-
-                headers:{
-
-                    'Authorization': 'Bearer ' + accessToken
-
-                }
+                });
 
             });
 
         }
 
+    });
+
+    //上传用户头像
+    $('.chooseImg').unbind('change').bind('change', function (event) {
+        let url = apiUrl + '/user/update',
+            file = $('#avatar')[0].files[0],
+            reader = new FileReader();
+
+        reader.readAsDataURL(file);
+
+        reader.onload = function (e) {
+
+            let image = e.target['result'];
+
+            $('.user-avatar').attr('src', image);
+
+            updateUser(url, {field: 'avatar', value: image});
+
+        }
+
+    })
+
+});
+
+let updateUser = function(url, data, callback){
+
+    //请求ajax
+    ajax(url, 'PUT', data, function (res) {
+
+        wcPop({ content: res.message, time:1});
+
+        if(res.code === 0){
+
+            localStorage.setItem('user_' + data['field'], data['value']);
+
+            callback && callback();
+
+        }
+
+    },function () {
+
+        console.log(JSON.stringify(e))
+
+    })
+
+};
+
+//封装ajax
+let ajax = function (url, method, data, successCallback, errorCallback) {
+
+    let accessToken = localStorage.getItem('user_access_token');
+
+    if(accessToken){
+
         $.ajaxSetup({
 
             headers:{
 
-                'Accept': 'application/json'
+                'Authorization': 'Bearer ' + accessToken
 
             }
 
         });
 
-        let ajaxIndex = '';
+    }
 
-        $.ajax({
+    $.ajaxSetup({
 
-            url:url,
+        headers:{
 
-            method:method,
+            'Accept': 'application/json'
 
-            dataType:'json',
+        }
 
-            contentType : "application/json; charset=utf-8",
+    });
 
-            data:JSON.stringify(data) ,
+    let ajaxIndex = '';
 
-            beforeSend:function(){
+    $.ajax({
 
-                ajaxIndex = wcPop({'id': 'onRequest', 'shadeClose':false});
+        url:url,
 
-            },
-            complete:function(){
+        method:method,
 
-                wcPop.close(ajaxIndex);
+        dataType:'json',
 
-            },
+        contentType : "application/json; charset=utf-8",
 
-            success:function (result) {
+        data: data ? JSON.stringify(data) : '',
+
+        beforeSend:function(){
+
+            ajaxIndex = wcPop({id: 'onRequest', skin:'toast', content: '请求接口...', shadeClose:false, icon: 'loading'});
+
+        },
+        complete:function(){
+
+            wcPop.close(ajaxIndex);
+
+        },
+
+        success:function (result) {
+
+            //token失效
+            if(result.code === 20002){
+
+                wcPop({ content: result.message, time:1, end:function () {
+
+                        localStorage.removeItem('user_access_token');
+
+                        location.href = '/login';
+
+                    }
+
+                });
+
+            }else {
 
                 successCallback(result);
 
-            },
-
-            error:function (e) {
-
-                errorCallback(e);
-
             }
 
-        })
+        },
 
-    };
+        error:function (e) {
 
-    //弹窗
-    let confirmPopup = function (title,content,callback) {
-        let confirmPopupIndex = wcPop({
-            id: 'confirmPopup',
-            skin: 'ios',
-            title: title,
-            content: content,
-            style: 'background-color: #fff; max-width: 320px; width: 95%;',
-            shadeClose: false,
-            btns: [
-                {
-                    text: '提交',
-                    style: 'background:#ffba00;color:#fff;font-size:18px;',
-                    onTap() {
-                        let value = $("#confirmPopup input").val();
-                        callback(value, confirmPopupIndex);
-                    }
+            errorCallback(e);
+
+        }
+
+    })
+
+};
+
+let getUserInfo = function (callback) {
+
+    let url = apiUrl + '/user';
+
+    ajax(url, 'GET', '', function (res) {
+
+        if(res.code === 0){
+
+            localStorage.setItem('user_id', res.data['user']['id']);
+
+            callback(res.data['user']);
+
+        }else {
+
+            wcPop({ content: res.message, time:1});
+
+        }
+
+    },function (e) {
+
+        console.log(JOSN.stringify(e))
+
+    })
+
+};
+
+//弹窗
+let confirmPopup = function (title,content,callback) {
+    let confirmPopupIndex = wcPop({
+        id: 'confirmPopup',
+        skin: 'ios',
+        title: title,
+        content: content,
+        style: 'background-color: #fff; max-width: 320px; width: 95%;',
+        shadeClose: false,
+        btns: [
+            {
+                text: '提交',
+                style: 'background:#ffba00;color:#fff;font-size:18px;',
+                onTap() {
+                    let value = $("#confirmPopup input").val();
+                    callback(value, confirmPopupIndex);
                 }
-            ]
-        });
-    };
+            }
+        ]
+    });
+};
 
-});

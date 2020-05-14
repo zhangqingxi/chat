@@ -52,8 +52,8 @@ class WebSocketService implements WebSocketHandlerInterface
     {
         // TODO: Implement onClose() method.
         $uid = $this->wsTable->get('fd:' . $fd);
-        if ($uid !== false) {
-            $this->wsTable->del('uid:' . $uid['value']); // 解绑uid映射
+        if ($uid) {
+            $this->wsTable->del('uid:' . $uid['value'] ?? ''); // 解绑uid映射
         }
         $this->wsTable->del('fd:' . $fd);// 解绑fd映射
         $server->push($fd, "Goodbye #{$fd}");

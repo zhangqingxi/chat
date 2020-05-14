@@ -31,17 +31,17 @@
 				style: '',					//自定弹窗样式
 				skin: '',					//自定弹窗显示风格 ->目前支持配置  toast(仿微信toast风格)、footer(底部对话框风格)、actionsheet(底部弹出式菜单)、ios|android(仿微信样式)
 				icon: '',					//弹窗小图标(success | info | error | loading)
-				
+
 				shade: true,				//是否显示遮罩层
 				shadeClose: true,			//是否点击遮罩时关闭层
 				anim: 'scaleIn',			//scaleIn：缩放打开(默认)  fadeIn：渐变打开  fadeInUpBig：由上向下打开 fadeInDownBig：由下向上打开  rollIn：左侧翻转打开  shake：震动  footer：底部向上弹出
 				time: 0,					//设置弹窗自动关闭秒数1、 2、 3
 				zIndex: 9999,				//设置元素层叠
-				
+
 				btns: null,					//不设置则不显示按钮，btn参数: [{按钮1配置}, {按钮2配置}]
 				end: null					//层销毁后的回调函数
 			};
-		
+
 		_this.opts = options;
 		for(var i in config){
 			if(!(i in _this.opts)){
@@ -50,7 +50,7 @@
 		}
 		_this.init();
 	};
-	
+
 	wcPop.prototype = {
 		init: function(){
 			var _this = this, opt = _this.opts, xwbox = null,
@@ -62,7 +62,7 @@
 				}
 				return btnTpl;
 			}();
-			
+
 			util.$(opt.id) ? (xwbox = util.$(opt.id)) : (xwbox = _doc.createElement("div"), xwbox.id = opt.id);
 			opt.skin && (xwbox.setAttribute("type", opt.skin));
 			xwbox.setAttribute("index", index);
@@ -85,7 +85,7 @@
 			].join('');
 			//_doc.body.insertBefore(xwbox, _doc.body.childNodes[0]);
 			_doc.body.appendChild(xwbox);
-			
+
 			this.index = index++;
 			_this.callback();
 		},
@@ -98,11 +98,11 @@
 					typeof opt.end == "function" && opt.end.call(_this);
 				}, opt.time * 1000);
 			}
-			
+
 			//按钮事件
 			if(opt.btns){
 				for (var o = util.$(opt.id).getElementsByClassName("popui__panel-btn")[0].children, len = o.length, i = 0; i < len; i++)
-					util.touch(o[i], function(e){
+				    util.touch(o[i], function(e){
 						var idx = this.getAttribute("data-index"), btn = opt.btns[idx];
 						typeof btn.onTap === "function" && btn.onTap(e);
 					});
@@ -122,14 +122,14 @@
 			return idx;
 		}
 	};
-	
+
 	var exports = (function(){
 		//实例化弹窗(返回 弹窗索引值)
 		fn = function(args){
 			var o = new wcPop(args);
 			return o.index;
 		};
-		
+
 		//关闭弹窗
 		fn.close = function(index){
 			var index = index ? index : "";
@@ -144,7 +144,7 @@
 				}, 200)
 			}
 		}
-		
+
 		//加载css
 		fn.load = function(path){
 			for(var ck = _doc.createElement("link"), lk = _doc.getElementsByTagName("link"), i = lk.length; i > 0; i--)
@@ -154,7 +154,7 @@
 			ck.href = util.jspath() + path;
 			_doc.getElementsByTagName("head")[0].appendChild(ck);
 		};
-		
+
 		//更多接口
 		fn.moreAPI = function(title, content, time){
 			var opts = {
@@ -162,12 +162,12 @@
 			}
 			fn(opts);
 		};
-		
+
 		return fn;
 	}());
-	
+
 	//加载css
 	exports.load("skin/wcPop.css");
-	
+
 	win.wcPop = exports;
 }(window);

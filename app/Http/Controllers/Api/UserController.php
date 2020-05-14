@@ -8,9 +8,35 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Storage;
 
 class UserController extends BaseController
 {
+
+    /**
+     * 用户信息
+     */
+    public function index()
+    {
+
+        try {
+
+            /**@var User $user */
+            $user = auth()->user();
+
+            $user->sex = $user->sex ? '女' : '男';
+
+            $user->avatar = $user->avatar ? Storage::disk('public')->url($user->avatar) : $user->avatar;
+
+            return json(RESPONSE_SUCCESS_CODE, '获取用户信息成功', ['user' => $user]);
+
+        } catch (Exception $e) {
+
+            return json(RESPONSE_SERVER_EXCEPTION_CODE, RESPONSE_SERVER_EXCEPTION_MSG, ['exception_message' => $e->getMessage()]);
+
+        }
+
+    }
 
     /**
      * 更新用户信息
@@ -30,16 +56,53 @@ class UserController extends BaseController
 
             $value = $request->input('value');
 
-            /**@var User $user*/
+            /**@var User $user */
             $user = auth()->user();
 
-            switch ($field){
+            switch ($field) {
 
                 case 'chat_no':
 
-                    if($user->$field === $value){
+                    if ($user->$field === $value) {
 
                         throw new ApiException(USER_CHAT_NO_NOT_UPDATE_ERROR_MSG, USER_CHAT_NO_NOT_UPDATE_ERROR_CODE);
+
+                    }
+
+                    break;
+
+                case 'sex':
+
+                    $value = $value === '女' ? 1 : 0;
+
+                    break;
+
+                case 'avatar':
+
+                    list(2 => $type, 'mime' => $mime) = getimagesize($value);
+
+                    if (!in_array($type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+
+                        throw new ApiException(NOT_ALLOW_UPLOAD_FILE_FORMAT_MSG, NOT_ALLOW_UPLOAD_FILE_FORMAT_CODE);
+
+                    }
+
+                    //文件后缀
+                    $ext = image_type_to_extension($type);
+
+                    preg_match('/^(data:\s*image\/(\w+);base64,)/', $value, $matches);
+
+                    if (isset($matches[2])) {
+
+                        $image = base64_decode(str_replace($matches[1],'', $value));
+
+                        $value = $filename = './uploads/avatar/'.md5($this->generateRandom()).$ext;
+
+                        Storage::disk('public')->put($filename, $image);
+
+                    } else {
+
+                        throw new ApiException(FILE_UPLOAD_FAIL_MSG, FILE_UPLOAD_FAIL_CODE);
 
                     }
 
@@ -92,7 +155,7 @@ class UserController extends BaseController
             $user = User::create([
                 'username' => $request->input('username'),
                 'password' => bcrypt($request->input('password')),
-                'chat_no'  => $request->input('username'),
+                'chat_no' => $request->input('username'),
             ]);
 
             $token = $user->createToken('chatForToken')->accessToken;

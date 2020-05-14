@@ -19,6 +19,7 @@ class AlterUsersTableColumn extends Migration
             $table->string('avatar')->default('')->comment('头像');
             $table->unsignedTinyInteger('sex')->default(0)->comment('性别 0男 1女');
             $table->string('signature')->default('')->comment('个性签名');
+            $table->string('nickname', 16)->default('')->comment('昵称');
         });
     }
 
@@ -30,8 +31,7 @@ class AlterUsersTableColumn extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
-            $table->dropColumn(['chat_no', 'avatar', 'sex', 'signature']);
+            $table->dropColumn(['chat_no', 'avatar', 'sex', 'signature', 'nickname']);
         });
     }
 }
