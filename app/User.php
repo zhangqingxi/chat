@@ -82,4 +82,12 @@ class User extends Authenticatable
         return $this->where('username', $username)->first();
     }
 
+    /**
+     * 好友
+     */
+    public function friends()
+    {
+
+    }
+
 }

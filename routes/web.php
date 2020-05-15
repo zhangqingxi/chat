@@ -22,4 +22,12 @@ Route::group(['namespace' => 'Web'], function () {
 
     Route::get('user', 'ViewController@user');
 
+    Route::get('search', 'ViewController@search');
+
+    Route::group(['prefix' => 'user'], function (){
+
+        Route::get('find/{id}', 'ViewController@findUserResult');
+
+    });
+
 });

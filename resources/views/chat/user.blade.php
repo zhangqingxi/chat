@@ -21,7 +21,7 @@
             </div>
 
             <!-- //个人信息页 -->
-            <div class="wc__ucinfoPanel">
+            <div class="wc__ucinfoPanel wc__scrolling-panel">
 
                 <div class="wc__ucinfo-personal">
 
@@ -33,7 +33,7 @@
 
                                 <label class="lbl flex1">头像</label>
 
-                                <img alt="" class="uimg user-avatar" src="" style="color: " />
+                                <img alt="" class="uimg user-avatar" src=""/>
 
                                 <input class="chooseImg" id="avatar" type="file" accept="image/*" />
 

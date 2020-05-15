@@ -48,7 +48,7 @@ return [
         'ws' => [// Key为Table名称，使用时会自动添加Table后缀，避免重名。这里定义名为wsTable的Table
             'size'   => 102400,//Table的最大行数
             'column' => [// Table的列定义
-//                ['name' => 'value', 'type' => \Swoole\Table::TYPE_INT, 'size' => 8],
+                ['name' => 'value', 'type' => \Swoole\Table::TYPE_INT, 'size' => 8],
             ],
         ],
     ],

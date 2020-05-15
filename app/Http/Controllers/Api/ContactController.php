@@ -8,35 +8,45 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use phpDocumentor\Reflection\Types\Compound;
 use Storage;
 
-class UserController extends BaseController
+class ContactController extends BaseController
 {
 
     /**
-     * 用户信息
+     * 添加好友到通讯录
      */
-    public function index(Request $request)
+    public function add(Request $request)
     {
 
         try {
 
-            if($uid = $request->input('uid')){
+            $this->validate($request, [
+                'keyword' => 'required',
+            ], [
+                'keyword.required' => '搜索词不能为空',
+            ]);
 
-                $user = User::find($uid);
+            $keyword = $request->input('keyword');
 
-            }else{
+            /**@var User $user */
+            $user = auth()->user();
 
-                /**@var User $user */
-                $user = auth()->user();
+            //好友
+            $friends = [];
 
-            }
+            //群聊
+            $groupChats = [];
 
-            $user->sex = $user->sex ? '女' : '男';
+            //查找好友
+            $uid = User::where('id', '<>', $user->id)->where('chat_no', $keyword)->orWhere('username', $keyword)->orWhere('nickname', $keyword)->value('id') ?: '';
 
-            $user->avatar = $user->avatar ? Storage::disk('public')->url($user->avatar) : $user->avatar;
+            return json(RESPONSE_SUCCESS_CODE, '获取用户搜索结果成功', compact('friends', 'groupChats', 'uid'));
 
-            return json(RESPONSE_SUCCESS_CODE, '获取用户信息成功', ['user' => $user]);
+        } catch (ValidationException $e) {
+
+            return json(REQUEST_PARAMS_VALIDATE_ERROR_CODE, array_values($e->errors())[0][0]);
 
         } catch (Exception $e) {
 

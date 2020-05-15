@@ -1,24 +1,31 @@
+//api地址
 const apiUrl = 'https://chat.zhangqingxi.cn/api';
 
 $(function () {
 
     //注册用户
-    $('.register').unbind('click').bind('click', function (event) {
+    $('.register').unbind('click').bind('click', function () {
         let username = $('input[name=username]').val(),
             password = $('input[name=password]').val(),
             rePassword = $('input[name=re-password]').val();
 
         if(username === '' || username.trim() === ''){
 
-            wcPop({content: '账号不能为空！', time:1});
+            wcPop({content: '账号不能为空！', time:1, skin:'toast', icon: "info"});
+
+            return;
 
         }else if(password === '' || password.trim() === ''){
 
-            wcPop({ content: '密码不能为空！', time:1});
+            wcPop({ content: '密码不能为空！', time:1, skin:'toast', icon: "info"});
+
+            return;
 
         }else if(password !== rePassword){
 
-            wcPop({ content: '两次输入的密码不一致！', time:1});
+            wcPop({ content: '两次输入的密码不一致！', time:1, skin:'toast', icon: "info"});
+
+            return;
 
         }
 
@@ -26,13 +33,13 @@ $(function () {
             data = {username:username, password:password, re_password:rePassword},
             method = 'POST';
 
-        ajax(url,method,data, function (res) {
+        ajax(url,method,JSON.stringify(data), function (res) {
 
             if(res.code === 0){
 
-                wcPop({ content: res.message, time:1, end:function () {
+                wcPop({ content: res.message, time:1, skin:'toast', icon: "success", end:function () {
 
-                        localStorage.setItem('user_access_token', res.data.token);
+                        localStorage.setItem('user_access_token', res.data['token']);
 
                         location.href = '/';
 
@@ -42,7 +49,7 @@ $(function () {
 
             }else{
 
-                wcPop({ content: res.message, time:1});
+                wcPop({ content: res.message, time:1, skin:'toast', icon: "info"});
 
             }
 
@@ -55,17 +62,21 @@ $(function () {
     });
 
     //用户登陆
-    $('.login').unbind('click').bind('click', function (event) {
+    $('.login').unbind('click').bind('click', function () {
         let username = $('input[name=username]').val(),
             password = $('input[name=password]').val();
 
         if(username === '' || username.trim() === ''){
 
-            wcPop({content: '账号不能为空！', time:1});
+            wcPop({content: '账号不能为空！', time:1, skin:'toast', icon: "info"});
+
+            return;
 
         }else if(password === '' || password.trim() === ''){
 
-            wcPop({ content: '密码不能为空！', time:1});
+            wcPop({ content: '密码不能为空！', time:1, skin:'toast', icon: "info"});
+
+            return;
 
         }
 
@@ -73,11 +84,11 @@ $(function () {
             data = {username:username, password:password},
             method = 'POST';
 
-        ajax(url,method,data, function (res) {
+        ajax(url,method,JSON.stringify(data), function (res) {
 
             if(res.code === 0){
 
-                wcPop({ content: res.message, time:1, end:function () {
+                wcPop({ content: res.message, time:1, skin:'toast', icon: "success", end:function () {
 
                         localStorage.setItem('user_access_token', res.data['token']);
 
@@ -89,7 +100,7 @@ $(function () {
 
             }else{
 
-                wcPop({ content: res.message, time:1});
+                wcPop({ content: res.message, time:1, skin:'toast', icon: "info"});
 
             }
 
@@ -107,8 +118,7 @@ $(function () {
         let field = $(this).data('field'),
             title,
             inputHtml = $('#J__popupTmpl-input'),
-            value = $(this).find('.val').text(),
-            url = apiUrl + '/user/update';
+            value = $(this).find('.val').text();
 
         switch (field) {
 
@@ -161,11 +171,11 @@ $(function () {
 
                         style: 'line-height: 50px; ' + (value === '男' ? 'color: red' : ''),
 
-                        onTap(e) {
+                        onTap() {
 
                             value = '男';
 
-                            updateUser(url, {field:field,value:value}, function (){
+                            updateUser({field:field,value:value}, function (){
 
                                 $('.user-'+field).text(value);
 
@@ -186,7 +196,7 @@ $(function () {
 
                             value = '女';
 
-                            updateUser(url, {field:field,value:value}, function (){
+                            updateUser({field:field,value:value}, function (){
 
                                 $('.user-'+field).text(value);
 
@@ -208,7 +218,7 @@ $(function () {
 
                 value = val;
 
-                updateUser(url, {field:field,value:value}, function (){
+                updateUser({field:field,value:value}, function (){
 
                     $('.user-'+field).text(value);
 
@@ -223,43 +233,106 @@ $(function () {
     });
 
     //上传用户头像
-    $('.chooseImg').unbind('change').bind('change', function (event) {
-        let url = apiUrl + '/user/update',
-            file = $('#avatar')[0].files[0],
+    $('.chooseImg').unbind('change').bind('change', function () {
+        let file = $('#avatar')[0].files[0],
             reader = new FileReader();
 
         reader.readAsDataURL(file);
 
         reader.onload = function (e) {
 
-            let image = e.target['result'];
+            let value = e.target['result'];
 
-            $('.user-avatar').attr('src', image);
+            $('.user-avatar').attr('src', value);
 
-            updateUser(url, {field: 'avatar', value: image});
+            updateUser({field: 'avatar', value: value});
 
         }
 
-    })
+    });
+
+    //搜索数据
+    $('.search').unbind('keyup').bind('keyup', function (event) {
+
+        let value = $(this).val(), search_result_element = $('.search-result');
+
+        if(value === '' || value.trim() === ''){
+
+            search_result_element.find('.contact, .group_chat').css('display', 'none');
+
+            return;
+
+        }
+
+        search_result_element.find('.find-user').css('display', 'block').find('.value').text(value);
+
+        if(event.keyCode === 13){//回车键
+
+            search(value, function (res) {
+
+                //遍历好友数据
+
+                //编辑群聊数据
+
+            });
+
+        }
+
+    });
+
+    //搜索用户
+    $('.find-user').unbind('click').bind('click', function () {
+
+        let value = $(this).find('.value').text();
+
+        if(value === '' || value.trim() === ''){
+
+            return;
+
+        }
+
+        search(value, function (res) {
+
+            if(res.data['uid'] === ''){
+
+                wcPop({content: '用户不存在', time: 1, skin:'toast', icon: "info"});
+
+                return;
+
+            }
+
+            location.href = '/user/find/' + res.data['uid'];
+
+        });
+
+    });
+
+
 
 });
 
-let updateUser = function(url, data, callback){
+/**
+ * 搜索数据
+ * @param value 关键词
+ * @param callback 成功回调
+ */
+let search = function(value, callback){
 
-    //请求ajax
-    ajax(url, 'PUT', data, function (res) {
+    let url = apiUrl + '/search';
 
-        wcPop({ content: res.message, time:1});
+    ajax(url, 'GET',{keyword:value}, function (res) {
 
         if(res.code === 0){
 
-            localStorage.setItem('user_' + data['field'], data['value']);
+            callback && callback(res);
 
-            callback && callback();
+        }else{
+
+            wcPop({content: res.message, time: 1, skin:'toast', icon: "info"});
 
         }
 
-    },function () {
+    }, function (e) {
 
         console.log(JSON.stringify(e))
 
@@ -267,8 +340,79 @@ let updateUser = function(url, data, callback){
 
 };
 
-//封装ajax
-let ajax = function (url, method, data, successCallback, errorCallback) {
+/**
+ * 获取用户信息
+ * @param data 参数
+ * @param callback 回调
+ */
+let getUserInfo = function (data, callback) {
+
+    let url = apiUrl + '/user';
+
+    ajax(url, 'GET', data, function (res) {
+
+        if(res.code === 0){
+
+            callback(res.data['user']);
+
+        }else {
+
+            wcPop({content: res.message, time: 1, skin:'toast', icon: "info"});
+
+        }
+
+    },function (e) {
+
+        console.log(JSON.stringify(e))
+
+    })
+
+};
+
+/**
+ * 更新用户
+ * @param data 数据
+ * @param callback
+ */
+let updateUser = function(data, callback){
+
+    let url = apiUrl + '/user/update';
+
+    //请求ajax
+    ajax(url, 'PUT', JSON.stringify(data), function (res) {
+
+        if(res.code === 0){
+
+            wcPop({ content: res.message, time:1, skin:'toast', icon: "success"});
+
+            localStorage.setItem('user_' + data['field'], data['value']);
+
+            callback && callback();
+
+        }else{
+
+            wcPop({ content: res.message, time:1, skin:'toast', icon: "info"});
+
+        }
+
+    },function (e) {
+
+        console.log(JSON.stringify(e))
+
+    })
+
+};
+
+/**
+ * 封装ajax
+ * @param url 地址
+ * @param method 方法
+ * @param data 数据
+ * @param successCallback 成功回调
+ * @param errorCallback 失败回调
+ * @param showLoading 是否loading
+ */
+let ajax = function (url, method, data, successCallback, errorCallback, showLoading = true) {
 
     let accessToken = localStorage.getItem('user_access_token');
 
@@ -308,16 +452,18 @@ let ajax = function (url, method, data, successCallback, errorCallback) {
 
         contentType : "application/json; charset=utf-8",
 
-        data: data ? JSON.stringify(data) : '',
+        data: data,
 
         beforeSend:function(){
 
-            ajaxIndex = wcPop({id: 'onRequest', skin:'toast', content: '请求接口...', shadeClose:false, icon: 'loading'});
+            if(showLoading)
+                ajaxIndex = wcPop({id: 'onRequest', skin:'toast', content: '请求接口...', shadeClose:false, icon: 'loading'});
 
         },
         complete:function(){
 
-            wcPop.close(ajaxIndex);
+            if(showLoading)
+                wcPop.close(ajaxIndex);
 
         },
 
@@ -326,7 +472,7 @@ let ajax = function (url, method, data, successCallback, errorCallback) {
             //token失效
             if(result.code === 20002){
 
-                wcPop({ content: result.message, time:1, end:function () {
+                wcPop({ content: result.message, time:1, skin:'toast', icon: "info", end:function () {
 
                         localStorage.removeItem('user_access_token');
 
@@ -354,33 +500,12 @@ let ajax = function (url, method, data, successCallback, errorCallback) {
 
 };
 
-let getUserInfo = function (callback) {
-
-    let url = apiUrl + '/user';
-
-    ajax(url, 'GET', '', function (res) {
-
-        if(res.code === 0){
-
-            localStorage.setItem('user_id', res.data['user']['id']);
-
-            callback(res.data['user']);
-
-        }else {
-
-            wcPop({ content: res.message, time:1});
-
-        }
-
-    },function (e) {
-
-        console.log(JOSN.stringify(e))
-
-    })
-
-};
-
-//弹窗
+/**
+ * 弹窗
+ * @param title 标题
+ * @param content 内容
+ * @param callback 回调
+ */
 let confirmPopup = function (title,content,callback) {
     let confirmPopupIndex = wcPop({
         id: 'confirmPopup',

@@ -29,6 +29,18 @@ Route::group(['namespace' => 'Api'], function () {
 
         });
 
+        Route::group(['prefix' => 'search'], function (){
+
+            Route::get('/', 'SearchController@index');
+
+        });
+
+        Route::group(['prefix' => 'contact'], function (){
+
+            Route::get('add', 'ContactController@add');
+
+        });
+
     });
 
 });

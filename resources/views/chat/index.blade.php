@@ -15,7 +15,7 @@
                     <!--最新未读消息-->
                     <h2 class="barTit barTitLg flex1">微聊<em class="ff-ar">(12)</em></h2>
 
-                    <a class="barIco sear" href="javascript:void(0);" id="J__topbarSear"></a>
+                    <a class="barIco sear" href="{{url('search')}}"></a>
 
                     <a class="barIco add" href="javascript:void(0);" id="J__topbarAdd"></a>
 

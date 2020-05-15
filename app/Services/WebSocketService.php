@@ -42,6 +42,8 @@ class WebSocketService implements WebSocketHandlerInterface
 
                 $this->wsTable->set('fd:' . $frame->fd, ['value' => $uid]);// 绑定fd到uid的映射
 
+                $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化']));
+
             }
 
         }
@@ -56,7 +58,6 @@ class WebSocketService implements WebSocketHandlerInterface
             $this->wsTable->del('uid:' . $uid['value'] ?? ''); // 解绑uid映射
         }
         $this->wsTable->del('fd:' . $fd);// 解绑fd映射
-        $server->push($fd, "Goodbye #{$fd}");
         Log::info('WebSocket 连接关闭');
     }
 }

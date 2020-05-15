@@ -43,6 +43,7 @@
 .wc__headerBar .inner .u-one{background: url(../img/topbar/icon__user.png) no-repeat center; background-size:.4rem;}
 .wc__headerBar .inner .u-qun{background: url(../img/topbar/icon__users.png) no-repeat center; background-size:.4rem;}
 .wc__headerBar .inner .sear{background: url(../img/topbar/icon__sear.png) no-repeat center; background-size:.4rem;}
+.wc__headerBar .inner .search{background: url(../img/topbar/icon__sear.png) no-repeat 10px; background-size:.4rem;}
 .wc__headerBar .inner .add{background: url(../img/topbar/icon__add.png) no-repeat center; background-size:.4rem;}
 
 /* __ tabBar四个页面滑动切换 */

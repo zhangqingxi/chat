@@ -4,7 +4,7 @@
 
         <ul class="flexbox flex-alignc wechat-pagination">
 
-            <li class="flex1 on"><i class="ico i1"><em class="wc__badge">12</em></i><span>微聊</span></li>
+            <li class="flex1"><i class="ico i1"><em class="wc__badge">12</em></i><span>微聊</span></li>
 
             <li class="flex1"><i class="ico i2"></i><span>通讯录</span></li>
 
@@ -20,7 +20,7 @@
 
 <!-- 左右滑屏切换.Start -->
 <script type="text/javascript">
-    let chatSwiper = new Swiper('.swiper-container',{
+    let name = '', chatSwiper = new Swiper('.swiper-container',{
         pagination: '.wechat-pagination',
         paginationClickable: true,
         paginationBulletRender: function (chatSwiper, index, className) {
@@ -41,6 +41,6 @@
             }
             return '<li class="flex1 ' + className + '">' + name + '</li>';
         }
-    })
+    });
 </script>
 <!-- 左右滑屏切换 end -->

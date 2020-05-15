@@ -47,4 +47,27 @@ class ViewController extends Controller
 
     }
 
+    /**
+     * 搜索页面
+     */
+    public function search()
+    {
+
+        return view('chat.search');
+
+    }
+
+
+    /**
+     * 搜索用户
+     * @param int $uid
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function findUserResult(int $uid = 0)
+    {
+
+        return view('chat.findUserResult', ['uid' => $uid]);
+
+    }
+
 }
