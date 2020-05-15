@@ -307,7 +307,11 @@ $(function () {
 
     });
 
-
+    //添加用户到通讯录
+    $('.add-contact').unbind('click').bind('click', function (){
+        
+        console.log(1)
+    });
 
 });
 
