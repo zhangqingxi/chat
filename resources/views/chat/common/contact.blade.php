@@ -4,7 +4,7 @@
 
         <div class="wc__addrFriend-list" id="J__addrFriendList">
 
-            <ul class="clearfix">
+            <ul class="clearfix contact-list">
 
                 <li>
 
@@ -12,7 +12,7 @@
 
                         <img class="uimg" alt="" src="{{asset('static/img/icon__addrFriend-img01.jpg')}}"/>
 
-                        <span class="name flex1">新的朋友</span>
+                        <a class="name flex1" href="{{url('friend/new')}}">新的朋友</a>
 
                     </div>
 
@@ -21,66 +21,6 @@
                         <img class="uimg" alt="" src="{{asset('static/img/icon__addrFriend-img02.jpg')}}"/>
 
                         <span class="name flex1">群聊</span>
-
-                    </div>
-
-                    <div class="row flexbox flex-alignc wc__material-cell">
-
-                        <img class="uimg" alt="" src="{{asset('static/img/icon__addrFriend-img03.jpg')}}"/>
-
-                        <span class="name flex1">标签</span>
-
-                    </div>
-
-                </li>
-
-                <li id="A">
-
-                    <h2 class="initial wc__borT">A</h2>
-
-                    <div class="row flexbox flex-alignc wc__material-cell">
-
-                        <img class="uimg" alt="" src="{{asset('static/img/uimg/u__chat-img09.jpg')}}"/>
-
-                        <span class="name flex1">Aster</span>
-
-                    </div>
-
-                    <div class="row flexbox flex-alignc wc__material-cell">
-
-                        <img class="uimg" alt="" src="{{asset('static/img/uimg/u__chat-img01.jpg')}}"/>
-
-                        <span class="name flex1">Alibaba-马云</span>
-
-                    </div>
-
-                </li>
-
-                <li id="B">
-
-                    <h2 class="initial wc__borT">B</h2>
-
-                    <div class="row flexbox flex-alignc wc__material-cell">
-
-                        <img class="uimg" alt="" src="{{asset('static/img/uimg/u__chat-img02.jpg')}}"/>
-
-                        <span class="name flex1">马蓉 ▪ ☀☼㈱</span>
-
-                    </div>
-
-                    <div class="row flexbox flex-alignc wc__material-cell">
-
-                        <img class="uimg" alt="" src="{{asset('static/img/uimg/u__chat-img03.jpg')}}"/>
-
-                        <span class="name flex1">周杰伦-Jay</span>
-
-                    </div>
-
-                    <div class="row flexbox flex-alignc wc__material-cell">
-
-                        <img class="uimg" alt="" src="{{asset('static/img/uimg/u__chat-img10.jpg')}}"/>
-
-                        <span class="name flex1">Bear</span>
 
                     </div>
 
@@ -124,3 +64,28 @@
         <em>Z</em>
     </div>
 </div>
+
+<script>
+
+    $(".wc__addrFriend-floatletter").on("click", "em", function() {
+
+        let letter = $(this).text(), item = $(".contact-list #" + letter);
+
+        if(item.length > 0){
+
+            // 滚动到指定位置
+            $("#J__addrFriendList").parent().animate({ scrollTop: item.position().top}, 300);
+
+        }
+
+        $(".wc__addrFriend-showletter").text(letter).fadeIn(300);
+
+        setTimeout(function(){
+
+            $(".wc__addrFriend-showletter").fadeOut(300);
+
+        }, 500);
+
+    });
+
+</script>

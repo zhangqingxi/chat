@@ -30,4 +30,12 @@ Route::group(['namespace' => 'Web'], function () {
 
     });
 
+    Route::group(['prefix' => 'friend'], function (){
+
+        Route::get('new', 'ViewController@newFriend');
+
+        Route::get('detail/{id}', 'ViewController@friendDetail');
+
+    });
+
 });

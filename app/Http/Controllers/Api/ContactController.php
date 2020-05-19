@@ -114,7 +114,7 @@ class ContactController extends BaseController
 
                         $image = base64_decode(str_replace($matches[1],'', $value));
 
-                        $value = $filename = './uploads/avatar/'.md5($this->generateRandom()).$ext;
+                        $value = $filename = './uploads/avatar/'.md5(generateRandom()).$ext;
 
                         Storage::disk('public')->put($filename, $image);
 

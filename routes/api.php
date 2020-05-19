@@ -41,6 +41,20 @@ Route::group(['namespace' => 'Api'], function () {
 
         });
 
+        Route::group(['prefix' => 'friend'], function (){
+
+            Route::post('add', 'FriendController@add');
+
+            Route::get('list', 'FriendController@lists');
+
+            Route::get('new', 'FriendController@apply');
+
+            Route::post('validate', 'FriendController@verify');
+
+            Route::PUT('remarks', 'FriendController@remarks');
+
+        });
+
     });
 
 });

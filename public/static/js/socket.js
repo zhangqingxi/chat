@@ -28,16 +28,6 @@ let initEventHandle = function () {
 
         console.log('ws断开连接: ' + e.code + ' ' + e.reason + ' ' + e.wasClean);
 
-        if(e.code === 1006 || e.code === 1005){
-
-            createWebSocket(wsUrl);
-
-            return ;
-
-        }
-
-        console.log("ws连接关闭!" + JSON.stringify(e));
-
     };
 
     webSocket.onerror = function (e) {
@@ -56,7 +46,27 @@ let initEventHandle = function () {
 
     webSocket.onmessage = function (event) {    //如果获取到消息，心跳检测重置
 
-        console.log("ws收到消息!" + event.data);
+        let data = $.parseJSON(event.data);
+
+        console.log("ws收到消息：" + data.message);
+
+        if(data.type === 'add_friend'){
+
+            let audio = new Audio(baseUrl + '/static/music/ding.mp3');
+
+            audio.play().then(r => function (e) {
+
+                console.log(JSON.stringify(e));
+
+            });
+
+        }else if(data.type === 'init'){
+
+            console.log(data.data);
+            //通讯录
+            contacts(data.data['contacts']);
+
+        }
 
     };
 

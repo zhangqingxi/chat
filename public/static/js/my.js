@@ -1,5 +1,8 @@
+//url地址
+const baseUrl = 'https://chat.zhangqingxi.cn';
+
 //api地址
-const apiUrl = 'https://chat.zhangqingxi.cn/api';
+const apiUrl = baseUrl + '/api';
 
 $(function () {
 
@@ -309,11 +312,195 @@ $(function () {
 
     //添加用户到通讯录
     $('.add-contact').unbind('click').bind('click', function (){
-        
-        console.log(1)
+
+        let chat_no = $('.user-chat_no').text();
+
+        let url = apiUrl + '/friend/add';
+
+        ajax(url, 'POST', JSON.stringify({chat_no: chat_no}), function (res) {
+
+            if(res.code === 0){
+
+                wcPop({content: res.message, time: 1, skin:'toast', icon: "success"});
+
+            }else{
+
+                wcPop({content: res.message, time: 1, skin:'toast', icon: "info"});
+
+            }
+
+        }, function (e) {
+
+            console.log(JSON.stringify(e));
+
+        });
+
+    });
+
+    //修改好友备注
+    $('.user_remarks').unbind('click').bind('click', function (){
+
+        let title = '修改备注',
+            inputHtml = $('#J__popupTmpl-input'),
+            value = $(this).text(),
+            friend_id = $('.friend_id').val();
+
+        inputHtml.find('input').attr('value', value);
+
+        confirmPopup(title, inputHtml.html(), function (val, index) {
+
+            value = val;
+
+            let url = apiUrl + '/friend/remarks';
+
+            ajax(url, 'PUT', JSON.stringify({friend_id: friend_id, remarks: value}), function (res) {
+
+                if(res.code === 0){
+
+                    wcPop({ content: res.message, time:1, skin:'toast', icon: "success", end: function () {
+
+                            $('.user_remarks').text(value);
+
+                            wcPop.close(index);
+
+                        }});
+
+                }else{
+
+                    wcPop({ content: res.message, time:1, skin:'toast', icon: "info"});
+
+                }
+
+            }, function (e) {
+
+                console.log(JSON.stringify(e));
+
+            });
+
+        });
+
     });
 
 });
+
+/**
+ * 好友申请列表
+ */
+let newFriendsList = function(){
+
+    let url = apiUrl + '/friend/new';
+
+    ajax(url, 'GET', '', function (res) {
+
+        if(res.code === 0){
+
+            $.each(res.data['lists'], function (k, v) {
+
+                let html =  '<div class="row flexbox flex-alignc wc__material-cell">' +
+
+                            '<img class="uimg" alt="" src="'+v['friend']['avatar']+'"/>' +
+
+                            '<span class="name flex1">'+(v['friend']['remarks'] ? v['friend']['remarks'] : (v['friend']['nickname'] ? v['friend']['nickname'] : v['friend']['username']))+'</span>' +
+
+                            '<div class="friend-span">';
+
+                if(v['is_friend_count'] === 1){
+
+                    html += '<span class="friend-passed">已添加</span>';
+
+                }else{
+
+                    html += '<span class="friend-pass" data-id="'+v['id']+'">通过</span>&nbsp;<span class="friend-refuse" data-id="'+v['id']+'">拒绝</span>';
+
+                }
+
+                html += '</div></div>';
+
+                $('.new-friends').append(html);
+
+                //通过
+                $('.new-friends .friend-pass').unbind('click').bind('click', function () {
+
+                    let id = $(this).data('id'), _self = $(this).parent();
+
+                    validateFriend(id, 0, _self);
+
+                });
+
+                //拒绝
+                $('.new-friends .friend-refuse').unbind('click').bind('click', function () {
+
+                    let id = $(this).data('id'), _self = $(this).parent();
+
+                    validateFriend(id, 1, _self);
+
+                });
+
+            })
+
+        }else{
+
+            wcPop({content: res.message, time: 1, skin:'toast', icon: "info"});
+
+        }
+
+    }, function (e) {
+
+        console.log(JSON.stringify(e));
+
+    })
+
+};
+
+/**
+ * 验证好友
+ * @param id 好友请求ID
+ * @param type 类型 0通过 1拒绝
+ * @param _self 元素节点
+ */
+let validateFriend = function(id, type = 0,_self){
+
+    let url = apiUrl + '/friend/validate';
+
+    ajax(url, 'POST', JSON.stringify({id:id, type: type}), function (res) {
+
+        if(res.code === 0) {
+
+            wcPop({
+
+                content: res.message, time: 1, skin: 'toast', icon: "success", end: function () {
+
+                    _self.html('<span class="friend-passed">已添加</span>');
+
+                }
+
+            });
+
+        }else if(res.code === 20010){
+
+            wcPop({
+
+                content: res.message, time: 1, skin: 'toast', icon: "success", end: function () {
+
+                    _self.parent().remove();
+
+                }
+
+            });
+
+        }else{
+
+            wcPop({content: res.message, time: 1, skin:'toast', icon: "info"});
+
+        }
+
+    }, function (e) {
+
+        console.log(JSON.stringify(e));
+
+    })
+
+};
 
 /**
  * 搜索数据
@@ -370,6 +557,44 @@ let getUserInfo = function (data, callback) {
         console.log(JSON.stringify(e))
 
     })
+
+};
+
+/**
+ * 通讯录列表
+ * @param data
+ */
+let contacts = function(data){
+
+    $.each(data, function (k, v) {
+
+        let html =  '<li id="'+k+'">' +
+
+                    '<h2 class="initial wc__borT">'+k+'</h2>';
+
+        $.each(v, function (key, value) {
+
+            html += '<div class="row flexbox flex-alignc wc__material-cell friend_item" data-id="'+value['friend_id']+'">' +
+
+                    '<img class="uimg" alt="" src="'+value['avatar']+'"/>' +
+
+                    '<span class="name flex1">'+value['nickname']+'</span>' +
+
+                    '</div>';
+
+        });
+
+        html +=     '</li>';
+
+        $('.contact-list').append(html);
+
+        $('.friend_item').unbind('click').bind('click', function (res) {
+
+            location.href = '/friend/detail/' + $(this).data('id')
+
+        })
+
+    });
 
 };
 

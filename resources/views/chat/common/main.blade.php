@@ -1,10 +1,10 @@
 <script>
 
-    let uid = "{{$uid ?? 0}}";
+    let uid = $('.friend_id').val();
 
     getUserInfo({uid: uid}, function (user) {
 
-        if(!uid)
+        if(uid === '0')
             window.localStorage.setItem('user_id', user['id']);
 
         $('.user-avatar').attr('src', user['avatar']);
@@ -18,6 +18,12 @@
         }else{
 
             $('.user-sex-img').attr('src', '{{asset('static/img/girl.png')}}')
+
+        }
+
+        if(user['friend']){
+
+            $('.user_remarks').text(user['friend']['remarks']);
 
         }
 

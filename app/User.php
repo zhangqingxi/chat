@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\UserFriend;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -49,6 +50,8 @@ use Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereSex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereSignature($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUsername($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserFriend[] $friends
+ * @property-read int|null $friends_count
  */
 class User extends Authenticatable
 {
@@ -87,6 +90,32 @@ class User extends Authenticatable
      */
     public function friends()
     {
+
+        return $this->hasMany(UserFriend::class, 'user_id', 'id');
+
+    }
+
+    /**
+     * 单个好友
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function friend()
+    {
+        return $this->hasOne(UserFriend::class, 'friend_id', 'id');
+    }
+
+
+    public function getAvatarAttribute()
+    {
+
+        return $this->attributes['avatar'] ? Storage::disk('public')->url($this->attributes['avatar']) : '';
+
+    }
+
+    public function getSexAttribute()
+    {
+
+        return $this->attributes['sex'] ? '女' : '男';
 
     }
 

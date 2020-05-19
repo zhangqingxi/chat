@@ -66,7 +66,29 @@ class ViewController extends Controller
     public function findUserResult(int $uid = 0)
     {
 
-        return view('chat.findUserResult', ['uid' => $uid]);
+        return view('chat.friend.add', ['uid' => $uid]);
+
+    }
+
+    /**
+     * 新朋友
+     */
+    public function newFriend()
+    {
+
+        return view('chat.friend.new');
+
+    }
+
+    /**
+     * 好友详情
+     * @param int $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function friendDetail(int $id = 0)
+    {
+
+        return view('chat.friend.detail', ['uid' => $id]);
 
     }
 

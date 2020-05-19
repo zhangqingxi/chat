@@ -13,7 +13,7 @@ class CreateUserFriendsTable extends Migration
      */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('user_friends', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id')->default(0)->comment('用户ID');
             $table->unsignedInteger('friend_id')->default(0)->comment('好友id');
@@ -29,6 +29,6 @@ class CreateUserFriendsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('user_friends');
     }
 }

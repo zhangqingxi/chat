@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\ApiException;
+use App\Models\UserFriend;
 use App\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Storage;
+use Swoole\WebSocket\Server;
 
 class UserController extends BaseController
 {
@@ -25,6 +27,9 @@ class UserController extends BaseController
 
                 $user = User::find($uid);
 
+                //好友信息
+                $user->friend;
+
             }else{
 
                 /**@var User $user */
@@ -32,9 +37,7 @@ class UserController extends BaseController
 
             }
 
-            $user->sex = $user->sex ? '女' : '男';
 
-            $user->avatar = $user->avatar ? Storage::disk('public')->url($user->avatar) : $user->avatar;
 
             return json(RESPONSE_SUCCESS_CODE, '获取用户信息成功', ['user' => $user]);
 
@@ -104,7 +107,7 @@ class UserController extends BaseController
 
                         $image = base64_decode(str_replace($matches[1],'', $value));
 
-                        $value = $filename = './uploads/avatar/'.md5($this->generateRandom()).$ext;
+                        $value = $filename = './uploads/avatar/'.md5(generateRandom()).$ext;
 
                         Storage::disk('public')->put($filename, $image);
 

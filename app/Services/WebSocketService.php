@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\UserFriend;
 use App\User;
 use Hhxsv5\LaravelS\Swoole\WebSocketHandlerInterface;
 use Illuminate\Support\Facades\Log;
@@ -34,15 +35,37 @@ class WebSocketService implements WebSocketHandlerInterface
 
             if($data['type'] === 'init') {
 
-                $user = User::find($data['data']['user_id']);
+                if($user = User::find($data['data']['user_id'])){
 
-                $uid = $user ? $user->id : 0; // 0 表示未登录的访客用户
+                    $this->wsTable->set('uid:' . $user->id, ['value' => $frame->fd]);// 绑定uid到fd的映射
 
-                $this->wsTable->set('uid:' . $uid, ['value' => $frame->fd]);// 绑定uid到fd的映射
+                    $this->wsTable->set('fd:' . $frame->fd, ['value' => $user->id]);// 绑定fd到uid的映射
 
-                $this->wsTable->set('fd:' . $frame->fd, ['value' => $uid]);// 绑定fd到uid的映射
+                    $contacts = [];
 
-                $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化']));
+                    foreach ($user->friends as $u){
+
+                        $is_friend_count = UserFriend::where('user_id', $u->friend_id)->where('friend_id', $u->user_id)->count();
+
+                        if($is_friend_count === 0) continue;
+
+                        $nickname = $u->remarks;
+
+                        $avatar = $u->contact->avatar;
+
+                        $friend_id = $u->friend_id;
+
+                        $charter = getFirstCharter($nickname);
+
+                        $contacts[$charter][] = compact('friend_id', 'nickname', 'avatar', 'is_friend_count');
+
+                    }
+
+                    ksort($contacts);
+
+                    $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化Socket', 'data' => ['contacts' => $contacts]]));
+
+                }
 
             }
 

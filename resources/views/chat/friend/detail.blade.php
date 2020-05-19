@@ -34,7 +34,7 @@
 
                                 <label class="lbl flex1">
 
-                                    <div style="display: inline-block"><em class="user-nickname" style="font-size: 18px"></em>&nbsp;<img alt="" class="" style="height: 18px;width: 18px;" src="{{asset('demo/img/boy.png')}}"/></div><i>微聊号：<span class="user-chat_no"></span></i>
+                                    <div style="display: inline-block"><em class="user-nickname" style="font-size: 18px"></em>&nbsp;<img alt="" class="user-sex-img" style="height: 18px;width: 18px;" src=""/></div><i>微聊号：<span class="user-chat_no"></span></i>
 
                                 </label>
 
@@ -43,6 +43,26 @@
                         </li>
 
                         <li>
+
+                            <div class="item flexbox flex-alignc wc__material-cell">
+
+                                <label class="lbl">备注</label>
+
+                                <div class="cnt flex1 c-999 user_remarks"></div>
+
+                            </div>
+
+                            <div class="item flexbox flex-alignc wc__material-cell">
+
+                                <label class="lbl">个人相册</label>
+
+                                <div class="cnt flex1">
+
+{{--                                    <img src="img/placeholder/wcZone-img01.jpg" /><img src="img/placeholder/wchat__img01.jpg" />--}}
+
+                                </div>
+
+                            </div>
 
                             <div class="item flexbox flex-alignc wc__material-cell">
 
@@ -60,7 +80,11 @@
 
                 <div class="wc__btns-panel">
 
-                    <a class="wc__btn-primary add-contact" href="javascript:void (0);">添加到通讯录</a>
+                    <input type="hidden" value="{{$uid ?? 0}}" class="friend_id">
+
+                    <a class="wc__btn-primary" href="javascript:void (0);">发消息</a>
+
+{{--                    <a class="wc__btn-default mt20" href="javascript:void (0);">视频聊天</a>--}}
 
                 </div>
 

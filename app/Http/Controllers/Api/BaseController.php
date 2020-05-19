@@ -10,16 +10,9 @@ use Illuminate\Http\Request;
 class BaseController extends Controller
 {
 
-    /**
-     * 生成唯一随机数
-     * @param string $prefix
-     * @return string
-     */
-    public function generateRandom(string $prefix = "PN")
+    public function __construct()
     {
-
-        return $prefix . (strtotime(date('YmdHis', time()))) . substr(microtime(), 2, 6) . sprintf('%03d', rand(0, 999));
-
+        \DB::enableQueryLog();
     }
 
 }
