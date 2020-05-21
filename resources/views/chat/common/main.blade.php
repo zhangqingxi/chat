@@ -1,11 +1,16 @@
 <script>
 
-    let uid = $('.friend_id').val();
+    let uid = $('.friend_id').val() || 0;
 
     getUserInfo({uid: uid}, function (user) {
 
-        if(uid === '0')
+        if(uid === 0){
+
             window.localStorage.setItem('user_id', user['id']);
+
+            window.localStorage.setItem('user_avatar', user['avatar']);
+
+        }
 
         $('.user-avatar').attr('src', user['avatar']);
 

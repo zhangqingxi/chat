@@ -24,6 +24,8 @@ Route::group(['namespace' => 'Web'], function () {
 
     Route::get('search', 'ViewController@search');
 
+    Route::get('chat/{uid}', 'ViewController@chat');
+
     Route::group(['prefix' => 'user'], function (){
 
         Route::get('find/{id}', 'ViewController@findUserResult');

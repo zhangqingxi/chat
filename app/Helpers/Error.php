@@ -36,7 +36,7 @@ const NOT_FIND_FRIEND_APPLY_CODE                    = 20008;
 const NOT_FIND_FRIEND_APPLY_MSG                     = '没有找到此申请记录';
 
 const FRIEND_NOT_EXIST_CODE                         = 20009;
-const FRIEND_NOT_EXIST_MSG                          = '要添加的好友不存在';
+const FRIEND_NOT_EXIST_MSG                          = '用户不存在';
 
 const REFUSED_FRIEND_APPLY_CODE                     = 20010;
 const REFUSED_FRIEND_APPLY_MSG                      = '已拒绝好友申请';
@@ -46,3 +46,10 @@ const FRIEND_NOT_EXIST_ON_CONTACT_MSG               = '此好友不在您的通�
 
 const FRIEND_REMARKS_SAVE_FAIL_CODE                 = 20012;
 const FRIEND_REMARKS_SAVE_FAIL_MSG                  = '好友备注修改失败';
+
+const SEND_CHAT_MESSAGE_FAIL_CODE                   = 20013;
+const SEND_CHAT_MESSAGE_FAIL_MSG                    = '消息发送失败';
+
+const NO_HAVE_MORE_MESSAGE_CODE                     = 20014;
+const NO_HAVE_MORE_MESSAGE_MSG                      = '没有更多的消息了';
+

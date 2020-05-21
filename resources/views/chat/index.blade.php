@@ -13,7 +13,7 @@
                 <div class="inner flexbox">
 
                     <!--最新未读消息-->
-                    <h2 class="barTit barTitLg flex1">微聊<em class="ff-ar">(12)</em></h2>
+                    <h2 class="barTit barTitLg flex1">微聊<span class="total_unread"><em class="ff-ar"></em></span></h2>
 
                     <a class="barIco sear" href="{{url('search')}}"></a>
 

@@ -82,7 +82,7 @@
 
                     <input type="hidden" value="{{$uid ?? 0}}" class="friend_id">
 
-                    <a class="wc__btn-primary" href="javascript:void (0);">发消息</a>
+                    <a class="wc__btn-primary" href="{{url('chat/'.$uid)}}">发消息</a>
 
 {{--                    <a class="wc__btn-default mt20" href="javascript:void (0);">视频聊天</a>--}}
 

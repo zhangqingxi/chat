@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\FriendChatMessage;
 use App\Models\UserFriend;
 use App\User;
+use Carbon\Carbon;
 use Hhxsv5\LaravelS\Swoole\WebSocketHandlerInterface;
 use Illuminate\Support\Facades\Log;
 use Swoole\WebSocket\Frame;
@@ -43,6 +45,8 @@ class WebSocketService implements WebSocketHandlerInterface
 
                     $contacts = [];
 
+                    $total_unread_count = 0;
+
                     foreach ($user->friends as $u){
 
                         $is_friend_count = UserFriend::where('user_id', $u->friend_id)->where('friend_id', $u->user_id)->count();
@@ -63,7 +67,42 @@ class WebSocketService implements WebSocketHandlerInterface
 
                     ksort($contacts);
 
-                    $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化Socket', 'data' => ['contacts' => $contacts]]));
+                    //消息面板
+                    $chatMessages = $user->chatMessages()->select('user_id')->distinct()->get();
+
+                    $chats = [];
+
+                    foreach ($chatMessages as $chatMessage){
+
+                        if($message = FriendChatMessage::where('user_id', $chatMessage->user_id)->where('friend_id', $user->id)->orderByDesc('created_at')->first()){
+
+                            $message->time = Carbon::parse($message->created_at)->toDateTimeString();
+
+                            if (Carbon::now() < Carbon::parse(time())->addDays(3)) {
+
+                                $message->time = Carbon::parse($message->created_at)->diffForHumans();
+
+                            }
+
+                            $message->unread_counts = FriendChatMessage::where('user_id', $chatMessage->user_id)->where('is_read', 0)->where('friend_id', $user->id)->count();
+
+                            $total_unread_count += $message->unread_counts;
+
+                            //好友信息
+                            $message->friend_info = User::where('id', $chatMessage->user_id)->first(['id','avatar']);
+
+                            $message->friend_info->remarks = UserFriend::where('user_id', $user->id)->where('friend_id', $chatMessage->user_id)->value('remarks');
+
+                            $chats[] = $message;
+
+                        }
+
+                    }
+
+                    //二维数组通过key排序
+                    $chats = arraySortByKey($chats, 'created_at', 'desc');
+
+                    $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化Socket', 'data' => ['total_unread_count' => $total_unread_count,'contacts' => $contacts, 'chats' => $chats]]));
 
                 }
 

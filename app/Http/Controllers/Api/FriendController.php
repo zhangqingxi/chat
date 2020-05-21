@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\ApiException;
+use App\Models\FriendChatMessage;
 use App\Models\UserFriend;
 use App\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -217,13 +219,22 @@ class FriendController extends BaseController
 
             $friend_id = $request->input('friend_id');
 
+            $friend_user = User::find($friend_id);
+
+            //用户不存在
+            if(!$friend_user){
+
+                throw new ApiException(FRIEND_NOT_EXIST_MSG, FRIEND_NOT_EXIST_CODE);
+
+            }
+
             /**@var User $user */
             $user = auth()->user();
 
             //是否存在此好友申请
             $userFriend = UserFriend::where('user_id', $user->id)->where('friend_id', $friend_id)->first();
 
-            //没有此申请记录
+            //不是你的好友
             if(!$userFriend){
 
                 throw new ApiException(FRIEND_NOT_EXIST_ON_CONTACT_MSG, FRIEND_NOT_EXIST_ON_CONTACT_CODE);
@@ -253,6 +264,197 @@ class FriendController extends BaseController
         } catch (Exception $e) {
 
             return json(RESPONSE_SERVER_EXCEPTION_CODE, RESPONSE_SERVER_EXCEPTION_MSG, ['exception_message' => $e->getMessage()]);
+
+        }
+
+    }
+
+
+    /**
+     * 聊天
+     */
+    public function chat(Request $request)
+    {
+
+        try {
+
+            $this->validate($request, [
+                'content' => 'required',
+            ], [
+                'content.required' => '聊天内容不能为空',
+            ]);
+
+            $content = $request->input('content');
+
+            $content_type = $request->input('type');
+
+            //这个ID是好友ID
+            $uid = $request->input('uid');
+
+            $friend_user = User::find($uid);
+
+            //用户不存在
+            if(!$friend_user){
+
+                throw new ApiException(FRIEND_NOT_EXIST_MSG, FRIEND_NOT_EXIST_CODE);
+
+            }
+
+            //未读消息条数
+            $unreadMessageCount = $friend_user->chatMessages->where('is_read', 0)->count();
+
+            /**@var User $user */
+            $user = auth()->user();
+
+            $friend_user = UserFriend::where('friend_id', $user->id)->where('user_id',  $uid)->first();
+
+            //不是你的好友
+            if(!$friend_user){
+
+                throw new ApiException(FRIEND_NOT_EXIST_ON_CONTACT_MSG, FRIEND_NOT_EXIST_ON_CONTACT_CODE);
+
+            }
+
+            $friendChatMessage = FriendChatMessage::create([
+
+                'user_id' => $user->id,
+
+                'friend_id' => $friend_user->user_id,
+
+                'content' => $content,
+
+                'content_type' => $content_type,
+
+            ]);
+
+            if(!$friendChatMessage->wasRecentlyCreated){
+
+                throw new ApiException(SEND_CHAT_MESSAGE_FAIL_MSG, SEND_CHAT_MESSAGE_FAIL_CODE);
+
+            }
+
+            $unreadMessageCount ++;
+
+            //给好友发送消息通知
+            $server = app('swoole');
+
+            $table = $server->wsTable->get('uid:' . $friend_user->user_id);
+
+            if($table && isset($table['value']) && $server->isEstablished($fd = $table['value'])) {
+
+                $time = Carbon::parse()->diffForHumans();
+
+                $server->push($fd, json_encode(['type' => 'friend_chat', 'message' => '收到来自'.($user->nickname ?: $user->username).'聊天消息', 'data' => ['avatar' => $user->avatar, 'friend_id' => $user->id, 'remarks' => $friend_user->remarks, 'aa' => $friend_user, 'content' => $content, 'counts' => $unreadMessageCount, 'time' => $time, 'type' => $content_type]]));
+
+            }
+
+            return json(RESPONSE_SUCCESS_CODE, '发送消息成功');
+
+        } catch (ValidationException $e) {
+
+            return json(REQUEST_PARAMS_VALIDATE_ERROR_CODE, array_values($e->errors())[0][0]);
+
+        } catch (ApiException $e) {
+
+            return json($e->getCode(), $e->getMessage());
+
+        } catch (Exception $e) {
+
+            return json(RESPONSE_SERVER_EXCEPTION_CODE, RESPONSE_SERVER_EXCEPTION_MSG, ['exception_message' => $e->getMessage()]);
+
+        }
+
+    }
+
+    /**
+     * 聊天消息
+     */
+    public function messages(Request $request)
+    {
+
+        try {
+
+            //这个ID是好友ID
+            $uid = $request->input('uid');
+
+            $friend_user = User::find($uid);
+
+            //用户不存在
+            if(!$friend_user){
+
+                throw new ApiException(FRIEND_NOT_EXIST_MSG, FRIEND_NOT_EXIST_CODE);
+
+            }
+
+            /**@var User $user */
+            $user = auth()->user();
+
+            $friend_user = UserFriend::where('friend_id', $user->id)->where('user_id',  $uid)->first();
+
+            //不是你的好友
+            if(!$friend_user){
+
+                throw new ApiException(FRIEND_NOT_EXIST_ON_CONTACT_MSG, FRIEND_NOT_EXIST_ON_CONTACT_CODE);
+
+            }
+
+            $messages = FriendChatMessage::where(['user_id' => $user->id, 'friend_id' => $friend_user->id])->orWhereRaw('(`user_id` = ? and `friend_id` = ?)', [$friend_user->id, $user->id])->orderByDesc('created_at')->paginate(10);
+
+            if(!$messages->items()){
+
+                throw new ApiException(NO_HAVE_MORE_MESSAGE_MSG, NO_HAVE_MORE_MESSAGE_CODE);
+
+            }
+
+            foreach ($messages as $message){
+
+                $message->time = Carbon::parse($message->created_at)->toDateTimeString();
+
+                if (Carbon::now() < Carbon::parse(time())->addDays(3)) {
+
+                    $message->time = Carbon::parse($message->created_at)->diffForHumans();
+
+                }
+
+                //我发的消息
+                if($message->user_id === $user->id){
+
+                    $message->mine = true;
+
+                    $info['id'] = $user->id;
+
+                    $info['avatar'] = $user->avatar;
+
+                    $info['remarks'] = '';
+
+                }else{
+
+                    $message->mine = false;
+
+                    $info['id'] = $message->user_id;
+
+                    $info['avatar'] = User::where('id', $message->user_id)->value('avatar');
+
+                    $info['remarks'] = UserFriend::where('user_id', $user->id)->where('friend_id', $message->user_id)->value('remarks');
+
+                }
+
+                $message->user = $info;
+
+            }
+
+            //更新未读消息为已读
+            FriendChatMessage::where('user_id', $friend_user->id)->where('friend_id', $user->id)->where('is_read', 0)->update(['is_read' => 1]);
+
+            return json(RESPONSE_SUCCESS_CODE, '获取聊天数据成功', ['messages' => $messages->items()]);
+
+        } catch (ApiException $e) {
+
+            return json($e->getCode(), $e->getMessage());
+
+        } catch (Exception $e) {
+
+            return json(RESPONSE_SERVER_EXCEPTION_CODE, RESPONSE_SERVER_EXCEPTION_MSG, ['exception_message' => $e->getMessage(), 'message' => $e->getMessage()]);
 
         }
 

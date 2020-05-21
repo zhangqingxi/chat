@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\FriendChatMessage;
 use App\Models\UserFriend;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -52,6 +53,7 @@ use Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUsername($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserFriend[] $friends
  * @property-read int|null $friends_count
+ * @property-read \App\Models\UserFriend|null $friend
  */
 class User extends Authenticatable
 {
@@ -116,6 +118,17 @@ class User extends Authenticatable
     {
 
         return $this->attributes['sex'] ? '女' : '男';
+
+    }
+
+    /**
+     * 我的聊天消息
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function chatMessages()
+    {
+
+        return $this->hasMany(FriendChatMessage::class, 'friend_id', 'id');
 
     }
 

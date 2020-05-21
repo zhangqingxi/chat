@@ -92,4 +92,16 @@ class ViewController extends Controller
 
     }
 
+    /**
+     * 聊天
+     * @param int $uid
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function chat(int $uid = 0)
+    {
+
+        return view('chat.friend.chat', ['uid' => $uid]);
+
+    }
+
 }

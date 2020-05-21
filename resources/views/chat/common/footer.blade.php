@@ -26,7 +26,7 @@
         paginationBulletRender: function (chatSwiper, index, className) {
             switch (index) {
                 case 0:
-                    name='<i class="ico i1"><em class="wc__badge">12</em></i><span>微聊</span>';
+                    name='<i class="ico i1"></i><span>微聊</span>';
                     break;
                 case 1:
                     name='<i class="ico i2"></i><span>通讯录</span>';

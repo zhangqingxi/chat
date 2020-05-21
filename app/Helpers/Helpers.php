@@ -262,3 +262,42 @@ if (!function_exists('getFirstCharter')) {
     }
 
 }
+
+
+if (!function_exists('arraySortByKey')) {
+
+    /**
+     * 二维数组根据某个值排序
+     * @param $array
+     * @param $key
+     * @param string $sort
+     * @return array
+     */
+    function arraySortByKey($array, $key, $sort = 'asc')
+    {
+
+        $newArr = $valArr = array();
+
+        foreach ($array as $k => $value) {
+
+            $valArr[$k] = $value[$key];
+
+        }
+
+        //先利用key对数组排序，目的是把目标数组的key排好序
+        ($sort == 'asc') ? asort($valArr) : arsort($valArr);
+
+        //指针指向数组第一个值
+        reset($valArr);
+
+        foreach ($valArr as $key => $value) {
+
+            $newArr[$key] = $array[$key];
+
+        }
+
+        return $newArr;
+
+    }
+
+}

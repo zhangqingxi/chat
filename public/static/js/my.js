@@ -633,6 +633,218 @@ let updateUser = function(data, callback){
 };
 
 /**
+ * 聊天
+ * @param uid 好友ID
+ * @param content 内容
+ * @param type 类型
+ */
+let chat = function(uid, content, type = 0){
+
+    let url = apiUrl + '/friend/chat';
+
+    ajax(url, 'POST', JSON.stringify({uid:uid, content:content, type:type}), function (res) {
+
+        if(res.code !== 0){
+
+            wcPop({ content: res.message, time:1, skin:'toast', icon: "info"});
+
+        }
+
+    }, function (e) {
+
+        console.log(JSON.stringify(e))
+
+    }, false);
+
+};
+
+/**
+ * 聊天列表
+ * @param data
+ */
+let chats = function(data){
+
+    $.each(data, function (k, v) {
+
+        let html = createChatItem(v['friend_info']['id'], v['friend_info']['avatar'], v['friend_info']['remarks'], v['content'], v['time'], v['unread_counts'], v['content_type']);
+
+        $('.chat-list').append(html);
+
+        $('.chat-item').unbind('click').bind('click', function () {
+
+            location.href = 'chat/' + $(this).data('id');
+
+        })
+
+    })
+
+};
+
+let chatMessage = function(uid, page){
+
+    let url = apiUrl + '/friend/messages';
+
+    ajax(url, 'GET', {uid: uid, page: page}, function (res) {
+
+        if(res.code === 0){
+
+            $.each(res.data['messages'], function (k, v) {
+
+                let html = '';
+
+                if(k !== 0 && k < res.data['messages'].length - 1){
+
+                    let dateBegin = new Date(res.data['messages'][k + 1]['created_at']),
+                        dateEnd = new Date(v['created_at']),//获取当前时间
+                        minutesDiff = Math.floor((dateEnd - dateBegin) / (60 * 1000));//计算出相差分钟数
+
+                    if(minutesDiff > 5){
+
+                        html += '<li class="time"><span>'+v['time']+'</span></li>';
+
+                    }
+
+                }
+
+                //我发的
+                if(v['mine']){
+
+                    html += '<li class="me">' +
+
+                        '<div class="content">';
+
+                    if(v['content_type'] === 0){
+
+                        html += '<div class="msg">' + v['content'] + '</div>';
+
+                    }
+
+                    html += '</div><a class="avatar" href="javascript:void(0);"><img alt="" src="'+v['user']['avatar']+'" /></a></li>';
+
+                }else{
+
+                    html += '<li class="others">' +
+
+                        '<a class="avatar" href="friend/detail/'+v['user']['id']+'"><img src="'+v['user']['avatar']+'" alt=""/></a>' +
+
+                        '<div class="content">';
+
+                    if(v['content_type'] === 0){
+
+                        html += '<div class="msg">' + v['content'] + '</div>'
+
+                    }
+
+                    html += '</div></li>';
+
+                }
+
+                $("#J__chatMsgList").prepend(html);
+
+            });
+
+            $(".wc__chatMsg-panel").animate({scrollTop: $("#J__chatMsgList").height()}, 0);
+
+        } else {
+
+            wcPop({ content: res.message, time:1, skin:'toast', icon: "info"});
+
+        }
+
+    }, function (e) {
+
+        console.log(JSON.stringify(e));
+
+    })
+
+};
+
+/**
+ * 创建聊天元素
+ * @param friend_id 好友ID
+ * @param avatar 好友头像
+ * @param remarks 好友备注
+ * @param content 消息内容
+ * @param time 发送时间
+ * @param counts 未读条数
+ * @param type 类型
+ * @returns {string}
+ */
+let createChatItem = function(friend_id, avatar, remarks, content, time, counts, type){
+
+    let html = '<li class="flexbox wc__material-cell chat-item chat-item-'+friend_id+'" data-id="'+friend_id+'">' +
+
+        '<div class="img"><img alt="" src="'+avatar+'"/>'+(counts > 0 ? '<em class="wc__badge">'+counts+'</em>' : '')+'</div>' +
+
+        '<div class="info flex1">' +
+
+        '<h2 class="title">'+remarks+'</h2>';
+
+    if(type === 0){//文本消息
+
+        html += '<div class="desc clamp1">'+content+'</div>';
+
+    }else if(type === 1){
+
+        html += '<div class="desc clamp1">[语音]</div>';
+
+    }else if(type === 2){
+
+        html += '<div class="desc clamp1">[图片]</div>';
+
+    }else if(type === 3){
+
+        html += '<div class="desc clamp1">[视频]</div>';
+
+    }
+
+    html += '</div>' +
+
+        '<label class="time">'+time+'</label>' +
+
+        '</li>';
+
+    return html;
+
+};
+
+/**
+ * 更新聊天消息
+ * @param friend_id 好友ID
+ * @param avatar 好友头像
+ * @param remarks 好友备注
+ * @param content 消息内容
+ * @param time 发送时间
+ * @param counts 未读条数
+ * @param type 类型
+ */
+let updateChat = function(friend_id, avatar, remarks, content, time, counts, type){
+
+    //是否存在聊天列表
+    if($('.chat-item-' + friend_id).length === 1){
+
+        $('.chat-item-' + friend_id + ' .wc__badge').text(counts);
+
+        $('.chat-item-' + friend_id + ' .clamp1').html(content);
+
+    }else{
+
+        //创建
+        let html = createChatItem(friend_id, avatar, remarks, content, time, counts, type);
+
+        $('.chat-list').prepend(html);
+
+        $('.chat-item').unbind('click').bind('click', function () {
+
+            location.href = 'chat/' + $(this).data('id');
+
+        })
+
+    }
+
+};
+
+/**
  * 封装ajax
  * @param url 地址
  * @param method 方法
