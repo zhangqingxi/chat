@@ -398,9 +398,9 @@ class FriendController extends BaseController
 
             }
 
-            $messages = FriendChatMessage::where(['user_id' => $user->id, 'friend_id' => $friend_user->id])->orWhereRaw('(`user_id` = ? and `friend_id` = ?)', [$friend_user->id, $user->id])->orderByDesc('created_at')->paginate(10);
+            $messages = FriendChatMessage::where(['user_id' => $user->id, 'friend_id' => $friend_user->user_id])->orWhereRaw('(`user_id` = ? and `friend_id` = ?)', [$friend_user->user_id, $user->id])->orderByDesc('created_at')->paginate(10);
 
-            if(!$messages->items()){
+            if(!$messages->items() && $request->input('page') !== 1){
 
                 throw new ApiException(NO_HAVE_MORE_MESSAGE_MSG, NO_HAVE_MORE_MESSAGE_CODE);
 
@@ -444,7 +444,7 @@ class FriendController extends BaseController
             }
 
             //更新未读消息为已读
-            FriendChatMessage::where('user_id', $friend_user->id)->where('friend_id', $user->id)->where('is_read', 0)->update(['is_read' => 1]);
+            FriendChatMessage::where('user_id', $friend_user->user_id)->where('friend_id', $user->id)->where('is_read', 0)->update(['is_read' => 1]);
 
             return json(RESPONSE_SUCCESS_CODE, '获取聊天数据成功', ['messages' => $messages->items()]);
 
@@ -458,6 +458,15 @@ class FriendController extends BaseController
 
         }
 
+    }
+
+    public function test()
+    {
+
+        echo 4112111;
+//        $chatMessages = FriendChatMessage::where(['user_id' => 1])->orWhere('friend_id', 1)->groupBy('user_id')->get();
+//
+//        print_r($chatMessages);
     }
 
 }

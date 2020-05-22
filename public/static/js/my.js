@@ -717,6 +717,10 @@ let chatMessage = function(uid, page){
 
                         html += '<div class="msg">' + v['content'] + '</div>';
 
+                    }else if(v['content_type'] === 2){//图片消息
+
+                        html += '<div class="msg">' + v['content'] + '</div>';
+
                     }
 
                     html += '</div><a class="avatar" href="javascript:void(0);"><img alt="" src="'+v['user']['avatar']+'" /></a></li>';
@@ -732,6 +736,10 @@ let chatMessage = function(uid, page){
                     if(v['content_type'] === 0){
 
                         html += '<div class="msg">' + v['content'] + '</div>'
+
+                    }else if(v['content_type'] === 2){//图片消息
+
+                        html += '<div class="msg">' + v['content'] + '</div>';
 
                     }
 

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Response;
+use Schema;
 
 class AppServiceProvider extends ServiceProvider
 {

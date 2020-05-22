@@ -9,18 +9,21 @@ use Carbon\Carbon;
 use Hhxsv5\LaravelS\Swoole\WebSocketHandlerInterface;
 use Illuminate\Support\Facades\Log;
 use Swoole\WebSocket\Frame;
+use Swoole\Http\Request;
 use Swoole\WebSocket\Server;
 
 class WebSocketService implements WebSocketHandlerInterface
 {
     /**@var \Swoole\Table $wsTable */
     private $wsTable;
+
     public function __construct()
     {
         $this->wsTable = app('swoole')->wsTable;
+
     }
 
-    public function onOpen(Server $server, \Swoole\Http\Request $request)
+    public function onOpen(Server $server, Request $request)
     {
         // TODO: Implement onOpen() method.
         Log::info('WebSocket 连接建立');
@@ -68,7 +71,10 @@ class WebSocketService implements WebSocketHandlerInterface
                     ksort($contacts);
 
                     //消息面板
-                    $chatMessages = $user->chatMessages()->select('user_id')->distinct()->get();
+//                    select id,user_id,friend_id, distinct(IF(`user_id` = 1, concat(`user_id`, `friend_id`), concat(`friend_id`, `user_id`))) from `chat_friend_chat_messages` where `user_id` = 1 or friend_id = 1  order by created_at desc;
+//                    $chatMessages = FriendChatMessage::where(['user_id' => $user->id])->orWhere('friend_id', $user->id)->groupByRaw('IF(`user_id` = ?, concat(`user_id`, `friend_id`), concat(`friend_id`, `user_id`)', [$user->id])->get();
+
+                    $chatMessages = $user->chatMessages()->groupBy(['user_id', 'friend_id'])->get();
 
                     $chats = [];
 
@@ -102,7 +108,7 @@ class WebSocketService implements WebSocketHandlerInterface
                     //二维数组通过key排序
                     $chats = arraySortByKey($chats, 'created_at', 'desc');
 
-                    $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化Socket', 'data' => ['total_unread_count' => $total_unread_count,'contacts' => $contacts, 'chats' => $chats]]));
+                    $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化Socket', 'data' => ['total_unread_count' => $total_unread_count,'contacts' => $contacts, 'chats' => $chatMessages]]));
 
                 }
 

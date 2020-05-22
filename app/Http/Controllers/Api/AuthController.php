@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\ApiException;
+use App\Models\FriendChatMessage;
 use App\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -17,9 +18,7 @@ class AuthController extends BaseController
      */
     public function login(Request $request)
     {
-
         try {
-
             $this->validate($request, [
                 'username' => 'required|min:3|max:10',
                 'password' => 'required|min:6|max:16',
