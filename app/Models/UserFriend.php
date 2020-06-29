@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserFriend whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserFriend whereUserId($value)
  * @property-read \App\User $friend
+ * @property-read \App\User $contact
  */
 class UserFriend extends Model
 {

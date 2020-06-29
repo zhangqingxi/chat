@@ -29,7 +29,7 @@
 
                 <div class="inner flexbox">
 
-                    <label for="search"></label><input id="search" type="text" class="search" style="text-align: left;width: 80%;color:#fff;font-size: 18px;border: 1px solid #ffd100;text-indent: 35px;" placeholder="请输入您要搜索的内容">
+                    <label for="search"></label><input id="search" type="text" class="search" style="text-align: left;width: 80%;color:#fff;font-size: 17px;border: 1px solid #ffd100;text-indent: 35px;" placeholder="请输入您要搜索的内容">
 
                     <span style="font-size: 18px;padding-left: 5%; padding-top: 12px;color: #fff" onclick="history.back()">取消</span>
 

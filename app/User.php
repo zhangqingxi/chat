@@ -54,6 +54,8 @@ use Storage;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserFriend[] $friends
  * @property-read int|null $friends_count
  * @property-read \App\Models\UserFriend|null $friend
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FriendChatMessage[] $chatMessages
+ * @property-read int|null $chat_messages_count
  */
 class User extends Authenticatable
 {
