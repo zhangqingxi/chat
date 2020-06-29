@@ -80,7 +80,7 @@ class IndexController extends BaseController
         }
 
         //二维数组通过key排序
-        $chats = arraySortByKey($chats, 'created_at', 'desc');
+//        $chats = arraySortByKey($chats, 'created_at', 'desc');
 
         print_r(['total_unread_count' => $total_unread_count, 'contacts' => $contacts, 'chats' => $chatMessages]);
 
