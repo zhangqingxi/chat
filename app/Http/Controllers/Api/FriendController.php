@@ -460,13 +460,4 @@ class FriendController extends BaseController
 
     }
 
-    public function test()
-    {
-
-        echo 4112111;
-//        $chatMessages = FriendChatMessage::where(['user_id' => 1])->orWhere('friend_id', 1)->groupBy('user_id')->get();
-//
-//        print_r($chatMessages);
-    }
-
 }
