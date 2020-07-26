@@ -114,13 +114,17 @@ let initEventHandle = function () {
             //聊天页
             let html = '<li class="others">' +
 
-                        '<a class="avatar" href="friend/detail/'+data.data['friend_id']+'"><img src="'+data.data['avatar']+'" alt=""/></a>' +
+                        '<a class="avatar" href="/friend/detail/'+data.data['friend_id']+'"><img src="'+data.data['avatar']+'" alt=""/></a>' +
 
                         '<div class="content">';
 
             if(data.data['type'] === 0){
 
                 html += '<div class="msg">' + data.data['content'] + '</div>'
+
+            }else if(data.data['type'] === 2){//图片消息
+
+                html += '<div class="msg">' + data.data['content'] + '</div>';
 
             }
 

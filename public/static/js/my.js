@@ -541,7 +541,7 @@ let getUserInfo = function (data, callback) {
     let url = apiUrl + '/user';
 
     ajax(url, 'GET', data, function (res) {
-        console.log(res);return;
+
         if(res.code === 0){
 
             callback(res.data['user']);
@@ -729,7 +729,7 @@ let chatMessage = function(uid, page){
 
                     html += '<li class="others">' +
 
-                        '<a class="avatar" href="friend/detail/'+v['user']['id']+'"><img src="'+v['user']['avatar']+'" alt=""/></a>' +
+                        '<a class="avatar" href="/friend/detail/'+v['user']['id']+'"><img src="'+v['user']['avatar']+'" alt=""/></a>' +
 
                         '<div class="content">';
 
