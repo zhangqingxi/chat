@@ -99,7 +99,9 @@ let initEventHandle = function () {
             });
 
             //首页
-            let count = parseInt($('.total_unread .ff-ar .count').text());
+            let count = $('.total_unread .ff-ar .count').text();
+
+            count = count ? parseInt(count) : 0;
 
             count += 1;
 

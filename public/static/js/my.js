@@ -539,7 +539,7 @@ let search = function(value, callback){
 let getUserInfo = function (data, callback) {
 
     let url = apiUrl + '/user';
-
+    console.log(11);return;
     ajax(url, 'GET', data, function (res) {
 
         if(res.code === 0){
@@ -782,7 +782,7 @@ let createChatItem = function(friend_id, avatar, remarks, content, time, counts,
 
     let html = '<li class="flexbox wc__material-cell chat-item chat-item-'+friend_id+'" data-id="'+friend_id+'">' +
 
-        '<div class="img"><img alt="" src="'+avatar+'"/>'+(counts > 0 ? '<em class="wc__badge">'+counts+'</em>' : '')+'</div>' +
+        '<div class="img"><img alt="" src="'+avatar+'"/><em class="wc__badge">'+(counts > 0 ? counts : '')+'</em></div>' +
 
         '<div class="info flex1">' +
 

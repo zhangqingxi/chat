@@ -50,11 +50,12 @@ class WebSocketService implements WebSocketHandlerInterface
 
                     $total_unread_count = 0;
 
-                    foreach ($user->friends as $u){
+                    foreach ($user->friends as $u) {
 
+                        //好友 ==> 我 互为好友
                         $is_friend_count = UserFriend::where('user_id', $u->friend_id)->where('friend_id', $u->user_id)->count();
 
-                        if($is_friend_count === 0) continue;
+                        if ($is_friend_count === 0) continue;
 
                         $nickname = $u->remarks;
 
@@ -71,42 +72,44 @@ class WebSocketService implements WebSocketHandlerInterface
                     ksort($contacts);
 
                     //消息面板
-//                    select id,user_id,friend_id, distinct(IF(`user_id` = 1, concat(`user_id`, `friend_id`), concat(`friend_id`, `user_id`))) from `chat_friend_chat_messages` where `user_id` = 1 or friend_id = 1  order by created_at desc;
-//                    $chatMessages = FriendChatMessage::where(['user_id' => $user->id])->orWhere('friend_id', $user->id)->groupByRaw('IF(`user_id` = ?, concat(`user_id`, `friend_id`), concat(`friend_id`, `user_id`)', [$user->id])->get();
+                    $chatMessages = FriendChatMessage::where(['user_id' => $user->id])->orWhere('friend_id', $user->id)->orderBy('id', 'desc')->select(['id','user_id','friend_id','content', 'content_type','created_at'])->selectRaw('IF(`user_id` = 1, concat(`user_id`, `friend_id`), concat(`friend_id`, `user_id`)) as group_key')->get();
 
-                    $chatMessages = $user->chatMessages()->groupBy(['user_id', 'friend_id'])->get();
+                    //去重
+                    $chatMessages = array_unset_by_key($chatMessages, 'group_key');
 
-                    $chats = [];
+                    foreach ($chatMessages as $chatMessage) {
 
-                    foreach ($chatMessages as $chatMessage){
+                        $chatMessage->time = Carbon::parse($chatMessage->created_at)->toDateTimeString();
 
-                        if($message = FriendChatMessage::where('user_id', $chatMessage->user_id)->where('friend_id', $user->id)->orderByDesc('created_at')->first()){
+                        if (Carbon::now() < Carbon::parse(time())->addDays(3)) {
 
-                            $message->time = Carbon::parse($message->created_at)->toDateTimeString();
-
-                            if (Carbon::now() < Carbon::parse(time())->addDays(3)) {
-
-                                $message->time = Carbon::parse($message->created_at)->diffForHumans();
-
-                            }
-
-                            $message->unread_counts = FriendChatMessage::where('user_id', $chatMessage->user_id)->where('is_read', 0)->where('friend_id', $user->id)->count();
-
-                            $total_unread_count += $message->unread_counts;
-
-                            //好友信息
-                            $message->friend_info = User::where('id', $chatMessage->user_id)->first(['id','avatar']);
-
-                            $message->friend_info->remarks = UserFriend::where('user_id', $user->id)->where('friend_id', $chatMessage->user_id)->value('remarks');
-
-                            $chats[] = $message;
+                            $chatMessage->time = Carbon::parse($chatMessage->created_at)->diffForHumans();
 
                         }
 
-                    }
+                        //好友对我发送的消息
+                        if($chatMessage->friend_id === $user->id){
 
-                    //二维数组通过key排序
-                    $chats = arraySortByKey($chats, 'created_at', 'desc');
+                            $chatMessage->unread_counts = $a = FriendChatMessage::where('friend_id', $user->id)->where('user_id', $chatMessage->user_id)->where('is_read', 0)->count();
+
+                            $total_unread_count += $chatMessage->unread_counts;
+
+                            //好友信息
+                            $chatMessage->friend_info = User::where('id', $chatMessage->user_id)->first(['id', 'avatar']);
+
+                            $chatMessage->friend_info->remarks = UserFriend::where('user_id', $user->id)->where('friend_id', $chatMessage->user_id)->value('remarks');
+
+                        }else{
+
+                            //好友信息
+                            $chatMessage->friend_info = User::where('id', $chatMessage->friend_id)->first(['id', 'avatar']);
+
+                            $chatMessage->friend_info->remarks = UserFriend::where('user_id', $user->id)->where('friend_id', $chatMessage->friend_id)->value('remarks');
+
+                        }
+
+
+                    }
 
                     $server->push($frame->fd, json_encode(['type' => 'init', 'message' => '初始化Socket', 'data' => ['total_unread_count' => $total_unread_count,'contacts' => $contacts, 'chats' => $chatMessages]]));
 

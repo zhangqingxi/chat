@@ -301,3 +301,37 @@ if (!function_exists('arraySortByKey')) {
     }
 
 }
+
+
+if(!function_exists('array_unset_by_key')){
+
+    /**
+     * 二维数组根据key去重复
+     * @param $array
+     * @param $key
+     * @return array $result
+     */
+    function array_unset_by_key($array, $key)
+    {
+
+        $result = [];
+
+        foreach ($array as $item => $value) {
+
+            if(!isset($result[$value[$key]])){
+
+                $result[$value[$key]] = $value;
+
+            }else{
+
+                unset($array[$item]);
+
+            }
+
+        }
+
+        return $array;
+
+    }
+
+}
