@@ -4,7 +4,9 @@
 
     <!-- <>微聊主容器 -->
     <div class="wechat__panel clearfix">
-
+        <script>
+            console.log('uid:'+'{{$uid}}');
+        </script>
         <input type="hidden" value="{{$uid ?? 0}}" class="friend_id">
 
         <img src="" class="user_avatar" style="display: none;" alt="">

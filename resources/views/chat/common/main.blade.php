@@ -2,6 +2,8 @@
 
     let uid = $('.friend_id').val() || 0;
 
+    console.log('friend_id:' + $('.friend_id').val());
+
     getUserInfo({uid: uid}, function (user) {
 
         if(uid === 0){
