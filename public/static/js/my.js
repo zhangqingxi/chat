@@ -539,7 +539,9 @@ let search = function(value, callback){
 let getUserInfo = function (data, callback) {
 
     let url = apiUrl + '/user';
+
     console.log(11);return;
+
     ajax(url, 'GET', data, function (res) {
 
         if(res.code === 0){
