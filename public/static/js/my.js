@@ -540,7 +540,7 @@ let getUserInfo = function (data, callback) {
 
     let url = apiUrl + '/user';
 
-    console.log(11);return;
+    console.log(data);return;
 
     ajax(url, 'GET', data, function (res) {
 
