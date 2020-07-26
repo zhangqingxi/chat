@@ -24,10 +24,10 @@ class EventServiceProvider extends ServiceProvider
         ],
         //监听passport生成token和refreshToken事件
         AccessTokenCreated::class => [
-            RevokeOldTokens::class,
+            #RevokeOldTokens::class,
         ],
         RefreshTokenCreated::class => [
-            PruneOldTokens::class,
+            #PruneOldTokens::class,
         ],
     ];
 
